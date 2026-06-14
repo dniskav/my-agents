@@ -8,7 +8,7 @@
   "properties": {
     "agents": {
       "type": "object",
-      "description": "Named agents. Keys are displayed as-is in the agent tab (e.g. 'rimuru - (Orchestrator)').",
+      "description": "Named agents. Keys are displayed as-is in the agent tab (e.g. 'Rimuru - (Orchestrator)').",
       "additionalProperties": { "$ref": "#/$defs/AgentConfig" }
     },
     "browser_automation_engine": {
