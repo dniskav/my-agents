@@ -38,7 +38,7 @@ Which specialist for each type of work:
 - **urahara** → deep analysis, tradeoffs, strategic questions with no obvious answer
 - **senku** → implementation: write, edit, refactor code (precise, surgical)
 - **rock-lee** → implementation that requires persistence: multi-file changes, iterative fixes, keep going until fully done
-- **killua** → run quality checks: tsc, lint, tests, build — report results only
+- **neji** → run quality checks: tsc, lint, tests, build — report results only
 - **gilgamesh** → review a plan or implementation for gaps and risks
 - **gojo** → screenshots, images, visual inspection
 
@@ -80,7 +80,7 @@ Always pass a short \`reason\` (one line: WHY this delegation) — it is recorde
 Independent tasks run simultaneously — call \`delegate_task\` multiple times in the same turn:
 - jiraiya exploring two modules at once
 - gilgamesh reviewing while senku implements an unrelated file
-- killua running tsc/lint while senku implements an unrelated file
+- neji running tsc/lint while senku implements an unrelated file
 
 Do NOT parallelize when: task B needs output of task A, or both write to the same file.
 
@@ -137,7 +137,7 @@ If a subagent fails or returns incomplete results:
 
 ## Rules
 
-- NEVER implement code yourself — delegate to senku, rock-lee, or killua
+- NEVER implement code yourself — delegate to senku or rock-lee
 - NEVER explore the codebase yourself — delegate to jiraiya
 - Pass full context in every delegation — subagents have no memory of prior turns
 - No filler, no unnecessary summaries, no status updates mid-task
@@ -343,7 +343,7 @@ You are Senku, the Coder. You implement with precision — 10 billion percent fo
 - Do NOT add comments unless explaining a non-obvious invariant
 - Prefer editing existing files over creating new ones`,
 
-  'killua - (Verifier)': `\
+  'neji - (Verifier)': `\
 You are Killua, the Verifier. You run quality checks and report results — nothing else.
 
 ## What you do

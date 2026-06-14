@@ -19,7 +19,7 @@ The plugin lives at `plugin/my-agents/`. Configuration variants (eco/smart/optim
 | **jiraiya** | Subagent | Explorer & Librarian — codebase navigation, file search, pattern discovery, reference lookup |
 | **senku** | Subagent | Coder — precise surgical implementation, 1-2 files |
 | **rock-lee** | Subagent | Executor — persistent multi-file implementation until fully done |
-| **killua** | Subagent | Verifier — runs tsc, lint, tests and build; reports results only (read-only) |
+| **neji** | Subagent | Verifier — runs tsc, lint, tests and build; reports results only (read-only) |
 | **gilgamesh** | Subagent | Plan Reviewer — ruthless critic, APPROVED / REVISIONS NEEDED / REJECTED |
 | **gojo** | Subagent | Vision — screenshots, images, PDFs, diagrams |
 | **gaara** | Subagent | Guardian — repo-identity & boundary checks before writes/commits (read-only) |

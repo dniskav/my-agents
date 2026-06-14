@@ -4,7 +4,7 @@
 
 ### A hand-crafted multi-agent squad for [opencode](https://opencode.ai)
 
-One orchestrator. Ten specialists. Zero chaos.
+One orchestrator. Ten specialists. Zero chaos.  
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![opencode](https://img.shields.io/badge/built%20for-opencode-black)](https://opencode.ai)
@@ -21,7 +21,7 @@ It's inspired by `oh-my-openagent`, rebuilt from scratch with a focus on **safet
 
 ## ✨ Features
 
-- **🥷 11-agent squad** orchestrated via a custom `delegate_task` tool — agents call each other with a strict 6-section task format.
+- **🥷 11-agent squad** orchestrated via a custom `delegate_task` tool — agents call each other with a strict 6-section task format. Each agent has a focused role with no overlap.
 - **🛡️ Repo-Identity Guard ("Gaara")** — three layers that stop an agent from editing the *wrong* repository (the classic "I ran opencode in project A but asked it to fix project B" footgun).
 - **🔁 Autonomous loops & missions** — `/loop` iterates `execute → verify` against a checkable done-criterion without per-step gates; `/mission` runs a full gated workflow with crash-safe state.
 - **🌳 Delegation tree** — every delegation is logged (who called whom, why, model, duration) and each subagent's full prompt + reasoning is saved for inspection via `/delegations`.
@@ -36,14 +36,13 @@ It's inspired by `oh-my-openagent`, rebuilt from scratch with a focus on **safet
 | **norman** | primary | Planner — interviews, produces rigorous plans (validated by gilgamesh) |
 | **kakashi** | primary | Deep Worker — autonomous end-to-end: explore → implement → QA solo |
 | **urahara** | subagent | Oracle — architecture decisions, tradeoffs, strategic reasoning |
-| **jiraiya** | subagent | Explorer — codebase navigation, search, pattern discovery (read-only) |
+| **jiraiya** | subagent | Explorer & Librarian — codebase navigation, search, reference lookup (read-only) |
 | **senku** | subagent | Coder — precise, surgical implementation |
 | **rock-lee** | subagent | Executor — persistent multi-file implementation until done |
-| **killua** | subagent | Quick — fast isolated tasks: renames, typos, one-liners |
+| **neji** | subagent | Verifier — runs tsc / lint / tests / build and reports results (read-only) |
 | **gilgamesh** | subagent | Plan Reviewer — ruthless critic: APPROVED / REVISIONS / REJECTED |
-| **index** | subagent | Librarian — reference lookup, docs, usage examples |
 | **gojo** | subagent | Vision — screenshots, images, PDFs, diagrams |
-| **gaara** | subagent | Guardian — repo-identity & boundary checks before writes/commits |
+| **gaara** | subagent | Guardian — repo-identity & boundary checks before writes/commits (read-only) |
 
 Full reference with examples: [`squad-codex.md`](./squad-codex.md) · System prompts: [`plugin/my-agents/agents.ts`](./plugin/my-agents/agents.ts)
 

@@ -12,7 +12,7 @@ const READ_ONLY_AGENTS = new Set([
   "gilgamesh - (Plan Reviewer)",
   "jiraiya - (Explorer)",
   "gaara - (Guardian)",
-  "killua - (Verifier)",
+  "neji - (Verifier)",
 ])
 
 const AGENT_ALIASES: Record<string, string> = {
@@ -23,7 +23,7 @@ const AGENT_ALIASES: Record<string, string> = {
   kakashi:   "kakashi - (Deep Worker)",
   senku:     "senku - (Coder)",
   "rock-lee": "rock-lee - (Executor)",
-  killua:    "killua - (Verifier)",
+  neji:      "neji - (Verifier)",
   gilgamesh: "gilgamesh - (Plan Reviewer)",
   gojo:      "gojo - (Vision)",
   gaara:     "gaara - (Guardian)",
@@ -101,7 +101,7 @@ Agents and when to use them:
 - kakashi: autonomous end-to-end work — one agent explores, implements, verifies and QAs solo
 - senku: implement code — write, edit, refactor (precise, surgical)
 - rock-lee: implement with persistence — multi-file changes, iterative fixes, keep going until done
-- killua: run quality checks — tsc, lint, tests, build — and report results (read-only)
+- neji: run quality checks — tsc, lint, tests, build — and report results (read-only)
 - gilgamesh: review a plan or implementation for gaps and risks
 - gojo: analyze screenshots, images, diagrams
 - gaara: repo-identity & boundary guardian — verify you're in the right repo before writes/commits
@@ -113,7 +113,7 @@ subagent will run in the wrong working directory.`,
     args: {
       agent: tool.schema
         .string()
-        .describe("Short agent name: rimuru | norman | urahara | jiraiya | kakashi | senku | rock-lee | killua | gilgamesh | gojo | gaara"),
+        .describe("Short agent name: rimuru | norman | urahara | jiraiya | kakashi | senku | rock-lee | neji | gilgamesh | gojo | gaara"),
       task: tool.schema
         .string()
         .describe("Full task description — be explicit, include all needed context inline. Use the 6-section format when delegating complex work: TASK / EXPECTED OUTCOME / TOOLS TO USE / MUST DO / MUST NOT DO / CONTEXT"),

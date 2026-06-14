@@ -85,7 +85,7 @@
       "color": "#DC2626",
       "description": "Coder — precise implementation, edits and writes code"
     },
-    "killua - (Verifier)": {
+    "neji - (Verifier)": {
       "model": "opencode-go/deepseek-v4-flash",
       "fallback_models": [
         {
