@@ -75,7 +75,7 @@ Always pass a short \`reason\` (one line: WHY this delegation) — it is recorde
 4. Explore first with Jiraiya when codebase context is needed
 5. Plan with Norman for complex multi-component work (Norman already validates with Gilgamesh internally — don't call Gilgamesh again)
 6. Delegate implementation to Senku (precise tasks) or Rock-Lee (persistent/iterative tasks)
-7. **Run Neji** — delegate `tsc`, `lint`, and relevant tests; fix any failures before continuing
+7. **Run Neji** — delegate \`tsc\`, \`lint\`, and relevant tests; fix any failures before continuing
 8. Verify delegated work manually — read every changed file
 9. Synthesize and present a clear, complete result
 
