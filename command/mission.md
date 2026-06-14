@@ -45,7 +45,7 @@ Run this phase silently — no user approval needed.
 |---|---|
 | PDF files | `read` tool directly |
 | ZIP / tar.gz | `bash`: `unzip file.zip -d .tmp/intake/ && ls .tmp/intake/` then read contents |
-| Images | `read` tool (multimodal) — delegate analysis to gojo |
+| Images | `read` tool (multimodal) — delegate analysis to Gojo |
 | URLs | note for interview phase |
 
 ### 0b. Discover the project
@@ -57,11 +57,11 @@ find . -maxdepth 3 -not -path '*/node_modules/*' -not -path '*/.git/*' -not -pat
 cat README.md 2>/dev/null | head -50
 ```
 
-### 0c. Pattern analysis → delegate to jiraiya
+### 0c. Pattern analysis → delegate to Jiraiya
 
 ```
 delegate_task(
-  agent: "jiraiya",
+  agent: "Jiraiya",
   task: "TASK: Analyze the project at {directory}.
 EXPECTED OUTCOME: A concise analysis (max 30 lines) saved to .tmp/sessions/{session-id}/analysis.md covering:
 - existing component patterns and naming conventions
@@ -106,13 +106,13 @@ Write answers to `.tmp/sessions/{id}/interview.md`. Set `interview_complete: tru
 
 ---
 
-## Phase 2: Planning → delegate to norman
+## Phase 2: Planning → delegate to Norman
 
 Create context bundle at `.tmp/sessions/{id}/bundle.md` with: task, intake, interview answers, and any budget constraint (`--budget Xh`).
 
 ```
 delegate_task(
-  agent: "norman",
+  agent: "Norman",
   task: "TASK: Produce the mission plan for this project.
 CONTEXT: read .tmp/sessions/{session-id}/bundle.md for full context
 EXPECTED OUTCOME: A complete step-by-step plan saved to .tmp/sessions/{session-id}/plan.md. Each task must specify: file, action, details, verify step.
@@ -120,7 +120,7 @@ Also save any quality gaps to .tmp/sessions/{session-id}/quality-gaps.md"
 )
 ```
 
-Wait for norman to return.
+Wait for Norman to return.
 
 ### Quality gaps gate
 
@@ -134,14 +134,14 @@ Set `planning_complete: true`.
 
 Read and present `.tmp/sessions/{id}/plan.md`. Ask:
 - **y** → proceed to execution
-- **Describe changes** → re-delegate to norman with feedback
+- **Describe changes** → re-delegate to Norman with feedback
 - **n** → cancel mission
 
 STOP. Wait for user response. Set `plan_approved: true`.
 
 ---
 
-## Phase 4: Parallel Execution → delegate_task to senku / jiraiya / gilgamesh
+## Phase 4: Parallel Execution → delegate_task to Senku / Jiraiya / Gilgamesh
 
 Execute tasks from `plan.md`. For each batch of independent tasks, call `delegate_task` multiple times in a single response to run them in parallel.
 
@@ -149,17 +149,17 @@ Route each step based on content:
 
 | Step involves | Delegate to |
 |---|---|
-| File exploration, codebase search | `jiraiya` |
-| Code implementation, edits | `senku` |
+| File exploration, codebase search | `Jiraiya` |
+| Code implementation, edits | `Senku` |
 | Quick isolated changes | `killua` |
-| Plan or result review | `gilgamesh` |
+| Plan or result review | `Gilgamesh` |
 | Reference lookups, docs | `index` |
-| Visual/image analysis | `gojo` |
+| Visual/image analysis | `Gojo` |
 
 Example parallel execution:
 ```
-delegate_task(agent: "senku", task: "TASK: Implement X. CONTEXT: [details]")
-delegate_task(agent: "senku", task: "TASK: Implement Y. CONTEXT: [details]")  ← same response
+delegate_task(agent: "Senku", task: "TASK: Implement X. CONTEXT: [details]")
+delegate_task(agent: "Senku", task: "TASK: Implement Y. CONTEXT: [details]")  ← same response
 ```
 
 ### Failure handling
@@ -168,21 +168,21 @@ delegate_task(agent: "senku", task: "TASK: Implement Y. CONTEXT: [details]")  �
 
 **Strategic** (escalate to user): impossible requirement, architectural conflict, external service unavailable → STOP and wait for guidance.
 
-### Build validation → delegate to senku
+### Build validation → delegate to Senku
 
 ```
 delegate_task(
-  agent: "senku",
+  agent: "Senku",
   task: "TASK: Run the build validation for this project (npx tsc --noEmit / dotnet build / mypy).
 EXPECTED OUTCOME: Report pass ✅ or fail ❌ with errors. Save to .tmp/sessions/{session-id}/build-report.md"
 )
 ```
 
-### Code review → delegate to gilgamesh
+### Code review → delegate to Gilgamesh
 
 ```
 delegate_task(
-  agent: "gilgamesh",
+  agent: "Gilgamesh",
   task: "TASK: Review all files modified during execution (see execution-report.md).
 CONTEXT: read .tmp/sessions/{session-id}/execution-report.md
 EXPECTED OUTCOME: Critical issues only. Save to .tmp/sessions/{session-id}/review-report.md"
@@ -193,11 +193,11 @@ Write `.tmp/sessions/{id}/execution-report.md`. Set `execution_complete: true`.
 
 ---
 
-## Phase 5: Verification → delegate to gilgamesh
+## Phase 5: Verification → delegate to Gilgamesh
 
 ```
 delegate_task(
-  agent: "gilgamesh",
+  agent: "Gilgamesh",
   task: "TASK: Verify all acceptance criteria for the mission.
 CONTEXT: read .tmp/sessions/{session-id}/plan.md and execution-report.md
 EXPECTED OUTCOME: Verification report saved to .tmp/sessions/{session-id}/verification-report.md with ✅/⚠️/❌ for each criterion"

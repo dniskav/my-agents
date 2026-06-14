@@ -58,7 +58,7 @@ If the requested profile already equals the active one, say so and skip the copy
 
 ### 3. Confirm + remind to restart
 
-After a successful switch, report the new profile and its key model assignments (rimuru, the coders, gojo), then:
+After a successful switch, report the new profile and its key model assignments (Rimuru, the coders, Gojo), then:
 
 ```
 ✅ Profile → {profile}. Restart opencode for the plugin to reload the new models.

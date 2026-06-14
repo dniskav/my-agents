@@ -9,24 +9,24 @@ import { setSessionAgent, getSessionAgent, setSessionRoot, getSessionRoot } from
  *  en la TUI (Ctrl+X ↓). No escriben, así que el riesgo de sesiones huérfanas
  *  al perder la anidación es trivial. Los que escriben se mantienen anidados. */
 const READ_ONLY_AGENTS = new Set([
-  "gilgamesh - (Plan Reviewer)",
-  "jiraiya - (Explorer)",
-  "gaara - (Guardian)",
-  "neji - (Verifier)",
+  "Gilgamesh - (Plan Reviewer)",
+  "Jiraiya - (Explorer)",
+  "Gaara - (Guardian)",
+  "Neji - (Verifier)",
 ])
 
 const AGENT_ALIASES: Record<string, string> = {
-  rimuru:    "rimuru - (Orchestrator)",
-  norman:    "norman - (Planner)",
-  urahara:   "urahara - (Oracle)",
-  jiraiya:   "jiraiya - (Explorer)",
-  kakashi:   "kakashi - (Deep Worker)",
-  senku:     "senku - (Coder)",
-  "rock-lee": "rock-lee - (Executor)",
-  neji:      "neji - (Verifier)",
-  gilgamesh: "gilgamesh - (Plan Reviewer)",
-  gojo:      "gojo - (Vision)",
-  gaara:     "gaara - (Guardian)",
+  Rimuru:    "Rimuru - (Orchestrator)",
+  Norman:    "Norman - (Planner)",
+  Urahara:   "Urahara - (Oracle)",
+  Jiraiya:   "Jiraiya - (Explorer)",
+  Kakashi:   "Kakashi - (Deep Worker)",
+  Senku:     "Senku - (Coder)",
+  "Rock-Lee": "Rock-Lee - (Executor)",
+  Neji:      "Neji - (Verifier)",
+  Gilgamesh: "Gilgamesh - (Plan Reviewer)",
+  Gojo:      "Gojo - (Vision)",
+  Gaara:     "Gaara - (Guardian)",
 }
 
 interface AgentsConfig {
@@ -91,20 +91,20 @@ export function makeDelegateTask(client: PluginInput["client"], cfg: AgentsConfi
   return tool({
     description: `Delegate a task to a specialized subagent and wait for the full result.
 Available agents: ${Object.keys(AGENT_ALIASES).join(", ")}.
-Use the short alias (e.g. "senku") — the tool resolves the full name automatically.
+Use the short alias (e.g. "Senku") — the tool resolves the full name automatically.
 
 Agents and when to use them:
-- rimuru: orchestrate nested multi-step tasks
-- norman: produce a full implementation plan
-- urahara: deep analysis, tradeoffs, strategic questions
-- jiraiya: explore codebase — find files, symbols, patterns, docs and usage examples (read-only)
-- kakashi: autonomous end-to-end work — one agent explores, implements, verifies and QAs solo
-- senku: implement code — write, edit, refactor (precise, surgical)
-- rock-lee: implement with persistence — multi-file changes, iterative fixes, keep going until done
-- neji: run quality checks — tsc, lint, tests, build — and report results (read-only)
-- gilgamesh: review a plan or implementation for gaps and risks
-- gojo: analyze screenshots, images, diagrams
-- gaara: repo-identity & boundary guardian — verify you're in the right repo before writes/commits
+- Rimuru: orchestrate nested multi-step tasks
+- Norman: produce a full implementation plan
+- Urahara: deep analysis, tradeoffs, strategic questions
+- Jiraiya: explore codebase — find files, symbols, patterns, docs and usage examples (read-only)
+- Kakashi: autonomous end-to-end work — one agent explores, implements, verifies and QAs solo
+- Senku: implement code — write, edit, refactor (precise, surgical)
+- Rock-Lee: implement with persistence — multi-file changes, iterative fixes, keep going until done
+- Neji: run quality checks — tsc, lint, tests, build — and report results (read-only)
+- Gilgamesh: review a plan or implementation for gaps and risks
+- Gojo: analyze screenshots, images, diagrams
+- Gaara: repo-identity & boundary guardian — verify you're in the right repo before writes/commits
 
 IMPORTANT: if the task targets a DIFFERENT project than where opencode was launched,
 you MUST pass the absolute path of that project via the \`directory\` argument, or the
@@ -113,7 +113,7 @@ subagent will run in the wrong working directory.`,
     args: {
       agent: tool.schema
         .string()
-        .describe("Short agent name: rimuru | norman | urahara | jiraiya | kakashi | senku | rock-lee | neji | gilgamesh | gojo | gaara"),
+        .describe("Short agent name: Rimuru | Norman | Urahara | Jiraiya | Kakashi | Senku | Rock-Lee | Neji | Gilgamesh | Gojo | Gaara"),
       task: tool.schema
         .string()
         .describe("Full task description — be explicit, include all needed context inline. Use the 6-section format when delegating complex work: TASK / EXPECTED OUTCOME / TOOLS TO USE / MUST DO / MUST NOT DO / CONTEXT"),
@@ -136,11 +136,13 @@ subagent will run in the wrong working directory.`,
       timeoutMs: tool.schema
         .number()
         .optional()
-        .describe("Max time to wait for the subagent before flagging a timeout. Defaults to 300000 (5 min). Raise it for long persistent work (rock-lee, kakashi)."),
+        .describe("Max time to wait for the subagent before flagging a timeout. Defaults to 300000 (5 min). Raise it for long persistent work (Rock-Lee, Kakashi)."),
     },
 
     async execute({ agent, task, context, reason, notepadPath, directory, timeoutMs }, ctx) {
-      const agentKey = AGENT_ALIASES[agent.toLowerCase().trim()] ?? agent
+      const normalized = agent.toLowerCase().trim()
+      const agentKey =
+        Object.entries(AGENT_ALIASES).find(([k]) => k.toLowerCase() === normalized)?.[1] ?? agent
       const workdir = directory ?? ctx.directory
       const caller = getSessionAgent(ctx.sessionID)
       const reasonText = deriveReason(task, reason)

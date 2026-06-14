@@ -4,7 +4,7 @@ This is a custom opencode configuration with a multi-agent plugin system. When y
 
 ## What this is
 
-A hand-crafted agent squad built on top of opencode, inspired by oh-my-openagent. Each agent has a defined role, a curated prompt, and a recommended model. The system is orchestrated by **rimuru**, who delegates to specialists via the `delegate_task` tool.
+A hand-crafted agent squad built on top of opencode, inspired by oh-my-openagent. Each agent has a defined role, a curated prompt, and a recommended model. The system is orchestrated by **Rimuru**, who delegates to specialists via the `delegate_task` tool.
 
 The plugin lives at `plugin/my-agents/`. Configuration variants (eco/smart/optimal) live at the root as `my-agents.*.json`.
 
@@ -12,28 +12,28 @@ The plugin lives at `plugin/my-agents/`. Configuration variants (eco/smart/optim
 
 | Agent | Mode | Role |
 |---|---|---|
-| **rimuru** | Primary | Orchestrator — classifies intent, plans, delegates, verifies |
-| **norman** | Primary | Planner — interviews, produces rigorous plans, validates with gilgamesh |
-| **kakashi** | Primary | Deep Worker — autonomous end-to-end: explore → implement → QA solo |
-| **urahara** | Subagent | Oracle — architecture decisions, tradeoffs, strategic reasoning |
-| **jiraiya** | Subagent | Explorer & Librarian — codebase navigation, file search, pattern discovery, reference lookup |
-| **senku** | Subagent | Coder — precise surgical implementation, 1-2 files |
-| **rock-lee** | Subagent | Executor — persistent multi-file implementation until fully done |
-| **neji** | Subagent | Verifier — runs tsc, lint, tests and build; reports results only (read-only) |
-| **gilgamesh** | Subagent | Plan Reviewer — ruthless critic, APPROVED / REVISIONS NEEDED / REJECTED |
-| **gojo** | Subagent | Vision — screenshots, images, PDFs, diagrams |
-| **gaara** | Subagent | Guardian — repo-identity & boundary checks before writes/commits (read-only) |
+| **Rimuru** | Primary | Orchestrator — classifies intent, plans, delegates, verifies |
+| **Norman** | Primary | Planner — interviews, produces rigorous plans, validates with Gilgamesh |
+| **Kakashi** | Primary | Deep Worker — autonomous end-to-end: explore → implement → QA solo |
+| **Urahara** | Subagent | Oracle — architecture decisions, tradeoffs, strategic reasoning |
+| **Jiraiya** | Subagent | Explorer & Librarian — codebase navigation, file search, pattern discovery, reference lookup |
+| **Senku** | Subagent | Coder — precise surgical implementation, 1-2 files |
+| **Rock-Lee** | Subagent | Executor — persistent multi-file implementation until fully done |
+| **Neji** | Subagent | Verifier — runs tsc, lint, tests and build; reports results only (read-only) |
+| **Gilgamesh** | Subagent | Plan Reviewer — ruthless critic, APPROVED / REVISIONS NEEDED / REJECTED |
+| **Gojo** | Subagent | Vision — screenshots, images, PDFs, diagrams |
+| **Gaara** | Subagent | Guardian — repo-identity & boundary checks before writes/commits (read-only) |
 
 Full reference with examples: `squad-codex.md`
 
 ## How the system works
 
 ### Delegation
-Agents talk to each other via the `delegate_task` tool. Use the short alias (`rimuru`, `senku`, `rock-lee`, etc.) — the tool resolves the full name automatically.
+Agents talk to each other via the `delegate_task` tool. Use the short alias (`Rimuru`, `Senku`, `Rock-Lee`, etc.) — the tool resolves the full name automatically.
 
 ```
 delegate_task(
-  agent: "senku",
+  agent: "Senku",
   task: "...",         // 6-section format for complex work
   context: "...",      // optional extra context
   notepad: ".rimuru/notepad.md", // optional — injects session memory
@@ -46,7 +46,7 @@ delegate_task(
 ### Repo-identity guard (Gaara Guard)
 A session can span multiple projects, but the working directory does **not** follow the project the user names. Three layers prevent cross-project contamination:
 - **A — `directory` param**: pass the target project's absolute path so the subagent runs there (and its writes are whitelisted).
-- **B — prompts**: rimuru/kakashi/senku/rock-lee verify `git remote -v` vs the task's target before writing; delegate to **gaara** to adjudicate when unsure.
+- **B — prompts**: Rimuru/kakashi/senku/rock-lee verify `git remote -v` vs the task's target before writing; delegate to **Gaara** to adjudicate when unsure.
 - **C — `tool.execute.before` hook**: hard-blocks any write/edit whose path falls outside the active project roots (cwd + delegated `directory`s). Fail-open if no roots are registered.
 
 ### Session memory (notepad)
@@ -63,10 +63,10 @@ CONTEXT: [file paths, patterns, prior findings]
 ```
 
 ### Plan → Review → Execute loop
-1. **norman** produces the plan (interviews first for complex tasks)
-2. **gilgamesh** reviews it — APPROVED before rimuru executes
-3. **rimuru** delegates implementation to senku / rock-lee
-4. **rimuru** reads every changed file after delegation — doesn't trust self-reports
+1. **Norman** produces the plan (interviews first for complex tasks)
+2. **Gilgamesh** reviews it — APPROVED before Rimuru executes
+3. **Rimuru** delegates implementation to Senku / Rock-Lee
+4. **Rimuru** reads every changed file after delegation — doesn't trust self-reports
 
 ## Key files
 
@@ -103,6 +103,6 @@ The active config is loaded from `my-agents.json`. To switch variants, copy the 
 ## Notes
 
 - Agents are stateless across delegations — the notepad is the memory bridge
-- `gilgamesh` acts as both pre-plan gap checker (metis role) and post-plan validator (momus role)
-- `kakashi` is the go-to for self-contained tasks that don't need orchestration
-- `rock-lee` and `senku` are both coders — senku for precision, rock-lee for persistence
+- `Gilgamesh` acts as both pre-plan gap checker (metis role) and post-plan validator (momus role)
+- `Kakashi` is the go-to for self-contained tasks that don't need orchestration
+- `Rock-Lee` and `Senku` are both coders — Senku for precision, Rock-Lee for persistence

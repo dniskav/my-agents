@@ -22,7 +22,7 @@ Expected (parse from the input; ask ONCE only if the goal or done-criterion is m
    ```bash
    pwd && git remote -v && git status --short
    ```
-   If a `directory` was given and differs from cwd, use it as the working dir and pass it as `directory` in every `delegate_task`. If the goal names a project that doesn't match the remote, STOP and ask for the correct path. (Delegate to **gaara** if unsure.)
+   If a `directory` was given and differs from cwd, use it as the working dir and pass it as `directory` in every `delegate_task`. If the goal names a project that doesn't match the remote, STOP and ask for the correct path. (Delegate to **Gaara** if unsure.)
 
 2. Create session state:
    - Session id: `{timestamp}-loop-{slug}`
@@ -45,12 +45,12 @@ Repeat until exit. Each iteration:
 1. **Increment** `iteration` in the manifest. If `iteration > max_iterations` → exit with status `budget_exhausted`.
 
 2. **Execute** — delegate the next concrete step toward the goal. Route by content:
-   - implementation → `senku` (precise) or `rock-lee` (persistent/multi-file)
-   - exploration needed → `jiraiya`
+   - implementation → `Senku` (precise) or `Rock-Lee` (persistent/multi-file)
+   - exploration needed → `Jiraiya`
    - quick fix → `killua`
    Always pass `directory` (if set) and the notepad. Use the 6-section task format.
 
-3. **Verify the done-criterion** — run it directly (bash) when mechanical (tests/build/lint), or delegate to `gilgamesh` for judgment-based criteria.
+3. **Verify the done-criterion** — run it directly (bash) when mechanical (tests/build/lint), or delegate to `Gilgamesh` for judgment-based criteria.
    - ✅ criterion met → exit with status `success`.
    - ❌ not met → capture the failure output, append a short note to `.tmp/sessions/{id}/notepad.md`, continue.
 

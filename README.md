@@ -15,7 +15,7 @@ One orchestrator. Ten specialists. Zero chaos.
 
 ---
 
-**my-agents** turns opencode into a coordinated team. Instead of one model doing everything, a primary orchestrator (**rimuru**) classifies your intent, plans the work, and delegates each piece to the right specialist — a planner, an explorer, surgical coders, a ruthless reviewer, a vision agent, and more. Each agent has a curated prompt, a recommended model, and the minimum tools it needs.
+**my-agents** turns opencode into a coordinated team. Instead of one model doing everything, a primary orchestrator (**Rimuru**) classifies your intent, plans the work, and delegates each piece to the right specialist — a planner, an explorer, surgical coders, a ruthless reviewer, a vision agent, and more. Each agent has a curated prompt, a recommended model, and the minimum tools it needs.
 
 It's inspired by `oh-my-openagent`, rebuilt from scratch with a focus on **safety** (a repo-boundary guard), **observability** (a delegation tree you can inspect), and **cost control** (swappable model profiles, including a fully free one).
 
@@ -32,17 +32,17 @@ It's inspired by `oh-my-openagent`, rebuilt from scratch with a focus on **safet
 
 | Agent | Mode | Role |
 |---|---|---|
-| **rimuru** | primary | Orchestrator — classifies intent, plans, delegates, verifies |
-| **norman** | primary | Planner — interviews, produces rigorous plans (validated by gilgamesh) |
-| **kakashi** | primary | Deep Worker — autonomous end-to-end: explore → implement → QA solo |
-| **urahara** | subagent | Oracle — architecture decisions, tradeoffs, strategic reasoning |
-| **jiraiya** | subagent | Explorer & Librarian — codebase navigation, search, reference lookup (read-only) |
-| **senku** | subagent | Coder — precise, surgical implementation |
-| **rock-lee** | subagent | Executor — persistent multi-file implementation until done |
-| **neji** | subagent | Verifier — runs tsc / lint / tests / build and reports results (read-only) |
-| **gilgamesh** | subagent | Plan Reviewer — ruthless critic: APPROVED / REVISIONS / REJECTED |
-| **gojo** | subagent | Vision — screenshots, images, PDFs, diagrams |
-| **gaara** | subagent | Guardian — repo-identity & boundary checks before writes/commits (read-only) |
+| **Rimuru** | primary | Orchestrator — classifies intent, plans, delegates, verifies |
+| **Norman** | primary | Planner — interviews, produces rigorous plans (validated by Gilgamesh) |
+| **Kakashi** | primary | Deep Worker — autonomous end-to-end: explore → implement → QA solo |
+| **Urahara** | subagent | Oracle — architecture decisions, tradeoffs, strategic reasoning |
+| **Jiraiya** | subagent | Explorer & Librarian — codebase navigation, search, reference lookup (read-only) |
+| **Senku** | subagent | Coder — precise, surgical implementation |
+| **Rock-Lee** | subagent | Executor — persistent multi-file implementation until done |
+| **Neji** | subagent | Verifier — runs tsc / lint / tests / build and reports results (read-only) |
+| **Gilgamesh** | subagent | Plan Reviewer — ruthless critic: APPROVED / REVISIONS / REJECTED |
+| **Gojo** | subagent | Vision — screenshots, images, PDFs, diagrams |
+| **Gaara** | subagent | Guardian — repo-identity & boundary checks before writes/commits (read-only) |
 
 Full reference with examples: [`squad-codex.md`](./squad-codex.md) · System prompts: [`plugin/my-agents/agents.ts`](./plugin/my-agents/agents.ts)
 
@@ -51,7 +51,7 @@ Full reference with examples: [`squad-codex.md`](./squad-codex.md) · System pro
 A single opencode session can touch more than one project — but the working directory does **not** follow the project you name. my-agents prevents cross-project contamination with three layers:
 
 - **A — `directory` param** on `delegate_task`: run a subagent in the *target* project's path (and whitelist its writes).
-- **B — prompts**: rimuru, kakashi, senku, rock-lee verify `git remote -v` against the task's target before writing; delegate to **gaara** to adjudicate when unsure.
+- **B — prompts**: Rimuru, Kakashi, Senku, Rock-Lee verify `git remote -v` against the task's target before writing; delegate to **Gaara** to adjudicate when unsure.
 - **C — `tool.execute.before` hook**: hard-blocks any `write`/`edit` whose path falls outside the active project roots. Fail-open when no roots are registered.
 
 ## 🔁 Loops, missions & the delegation tree

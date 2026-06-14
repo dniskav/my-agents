@@ -29,16 +29,16 @@ If the task is clear, proceed directly to Phase 2.
 
 ---
 
-## Phase 2: Plan — delegate to norman
+## Phase 2: Plan — delegate to Norman
 
 ```
 delegate_task(
-  agent: "norman",
+  agent: "Norman",
   task: "TASK: Decompose this task into parallel-executable subtasks.
 TASK DESCRIPTION: {task}
 EXPECTED OUTCOME: A list of subtasks with:
 - title and description
-- which specialist to use (senku/jiraiya/killua/gilgamesh/index/gojo)
+- which specialist to use (Senku/jiraiya/killua/gilgamesh/index/gojo)
 - dependencies (which tasks must complete before this one can start)
 MUST DO: group independent tasks so they can run in parallel"
 )
@@ -49,9 +49,9 @@ Present the breakdown to the user:
 ## Swarm Plan: {task}
 
 ### Tasks
-1. [task 1] → senku (no dependencies)
-2. [task 2] → senku (no dependencies)
-3. [task 3] → gilgamesh (needs 1 + 2)
+1. [task 1] → Senku (no dependencies)
+2. [task 2] → Senku (no dependencies)
+3. [task 3] → Gilgamesh (needs 1 + 2)
 
 Independent tasks (run in parallel): 1, 2
 Sequential after: 3
@@ -69,34 +69,34 @@ Execute approved tasks using `delegate_task`. Call multiple `delegate_task` in a
 
 **Good (parallel — call both in one response):**
 ```
-delegate_task(agent: "senku", task: "TASK: Implement X...")
-delegate_task(agent: "senku", task: "TASK: Implement Y...")
+delegate_task(agent: "Senku", task: "TASK: Implement X...")
+delegate_task(agent: "Senku", task: "TASK: Implement Y...")
 ```
 
 **Bad (sequential — do NOT do this):**
 ```
-delegate_task(agent: "senku", task: "X") → wait → delegate_task(agent: "senku", task: "Y")
+delegate_task(agent: "Senku", task: "X") → wait → delegate_task(agent: "Senku", task: "Y")
 ```
 
 ### Routing guide
 
 | Work type | Agent |
 |---|---|
-| File exploration, search | `jiraiya` |
-| Code implementation | `senku` |
+| File exploration, search | `Jiraiya` |
+| Code implementation | `Senku` |
 | Quick single edits | `killua` |
-| Plan or result review | `gilgamesh` |
+| Plan or result review | `Gilgamesh` |
 | Docs, references | `index` |
-| Visual analysis | `gojo` |
+| Visual analysis | `Gojo` |
 
 ### Progress reporting
 
 After each batch completes, report inline:
 ```
-→ Running in parallel: task-1 (senku), task-2 (senku)
+→ Running in parallel: task-1 (Senku), task-2 (Senku)
 ✓ task-1 complete
 ✓ task-2 complete
-→ Running: task-3 (gilgamesh) [depends on 1+2]
+→ Running: task-3 (Gilgamesh) [depends on 1+2]
 ✓ All tasks complete
 ```
 
@@ -120,4 +120,4 @@ When all tasks complete:
 Total agents used: N | Parallel batches: N
 ```
 
-Ask if the user wants a code review pass via gilgamesh.
+Ask if the user wants a code review pass via Gilgamesh.

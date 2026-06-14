@@ -41,10 +41,10 @@ Print an indented tree. For each node show: callee (short name), reason, model, 
 ({n} delegations · {totalDuration})
 
 root
-└─ norman  · "produce the mission plan"            · minimax-m2.7 · 12.3s
-   └─ gilgamesh  · "validate the plan"             · qwen3.6-plus · 4.1s
-└─ senku   · "implement the guard hook"            · mimo-v2.5-pro · 8.7s
-└─ gaara   · "verify target repo before commit"    · qwen3.6-plus · 1.9s ⏱ timeout
+└─ Norman  · "produce the mission plan"            · minimax-m2.7 · 12.3s
+   └─ Gilgamesh  · "validate the plan"             · qwen3.6-plus · 4.1s
+└─ Senku   · "implement the guard hook"            · mimo-v2.5-pro · 8.7s
+└─ Gaara   · "verify target repo before commit"    · qwen3.6-plus · 1.9s ⏱ timeout
 ```
 
 If `$ARGUMENTS` contains `--flat`, list edges chronologically instead of as a tree:
@@ -57,13 +57,13 @@ HH:MM:SS  caller → callee   "reason"   (model, duration)
 Each delegation's full transcript (the prompt sent + the agent's complete response) is saved at `.tmp/delegations/{childSession}.md`.
 
 - If `$ARGUMENTS` contains `--verbose` (no agent named): after the tree, append each transcript in chronological order.
-- If `$ARGUMENTS` names an agent (e.g. `/delegations gilgamesh`): show only that agent's transcript(s). Resolve `childSession` from the tree, then:
+- If `$ARGUMENTS` names an agent (e.g. `/delegations Gilgamesh`): show only that agent's transcript(s). Resolve `childSession` from the tree, then:
   ```bash
   cat .tmp/delegations/{childSession}.md
   ```
   If multiple matches, show the most recent (or list them and ask which).
 
-This is how you inspect WHAT gilgamesh actually reasoned, even though it ran as a nested session. (For watching it run LIVE, read-only agents like gilgamesh/jiraiya/gaara/index are flattened to the root session and appear in `Ctrl+X ↓`.)
+This is how you inspect WHAT Gilgamesh actually reasoned, even though it ran as a nested session. (For watching it run LIVE, read-only agents like Gilgamesh/jiraiya/gaara/index are flattened to the root session and appear in `Ctrl+X ↓`.)
 
 ### 4. Summary line
 

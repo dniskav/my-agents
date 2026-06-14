@@ -1,7 +1,7 @@
 {
   "$schema": "./my-agents.schema.json",
   "agents": {
-    "rimuru - (Orchestrator)": {
+    "Rimuru - (Orchestrator)": {
       "model": "opencode-go/qwen3.6-plus",
       "fallback_models": [
         {
@@ -15,7 +15,7 @@
       "color": "#F97316",
       "description": "Orchestrator — complex multi-step tasks, delegates to specialists"
     },
-    "norman - (Planner)": {
+    "Norman - (Planner)": {
       "model": "opencode-go/qwen3.6-plus",
       "fallback_models": [
         {
@@ -34,7 +34,7 @@
         "bash": false
       }
     },
-    "urahara - (Oracle)": {
+    "Urahara - (Oracle)": {
       "model": "opencode-go/qwen3.6-plus",
       "fallback_models": [
         {
@@ -53,7 +53,7 @@
         "bash": false
       }
     },
-    "jiraiya - (Explorer)": {
+    "Jiraiya - (Explorer)": {
       "model": "opencode-go/deepseek-v4-flash",
       "fallback_models": [
         {
@@ -71,7 +71,7 @@
         "edit": false
       }
     },
-    "senku - (Coder)": {
+    "Senku - (Coder)": {
       "model": "opencode-go/deepseek-v4-flash",
       "fallback_models": [
         {
@@ -85,7 +85,7 @@
       "color": "#DC2626",
       "description": "Coder — precise implementation, edits and writes code"
     },
-    "neji - (Verifier)": {
+    "Neji - (Verifier)": {
       "model": "opencode-go/deepseek-v4-flash",
       "fallback_models": [
         {
@@ -103,7 +103,7 @@
         "edit": false
       }
     },
-    "gilgamesh - (Plan Reviewer)": {
+    "Gilgamesh - (Plan Reviewer)": {
       "model": "opencode-go/qwen3.6-plus",
       "fallback_models": [
         {
@@ -122,7 +122,7 @@
         "bash": false
       }
     },
-    "gaara - (Guardian)": {
+    "Gaara - (Guardian)": {
       "model": "opencode-go/deepseek-v4-flash",
       "fallback_models": [
         {
@@ -140,7 +140,7 @@
         "edit": false
       }
     },
-    "rock-lee - (Executor)": {
+    "Rock-Lee - (Executor)": {
       "model": "opencode-go/deepseek-v4-flash",
       "fallback_models": [
         {
@@ -154,7 +154,7 @@
       "color": "#16A34A",
       "description": "Executor — relentless implementation, no shortcuts, keeps going until fully done"
     },
-    "kakashi - (Deep Worker)": {
+    "Kakashi - (Deep Worker)": {
       "model": "opencode-go/qwen3.6-plus",
       "fallback_models": [
         {
@@ -168,7 +168,7 @@
       "color": "#0EA5E9",
       "description": "Deep Worker — autonomous end-to-end execution: explores, plans, implements, verifies and QAs solo"
     },
-    "gojo - (Vision)": {
+    "Gojo - (Vision)": {
       "model": "opencode-go/mimo-v2.5",
       "fallback_models": [
         {
