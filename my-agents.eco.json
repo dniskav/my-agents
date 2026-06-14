@@ -4,8 +4,12 @@
     "rimuru - (Orchestrator)": {
       "model": "opencode-go/qwen3.6-plus",
       "fallback_models": [
-        { "model": "opencode-go/minimax-m2.7" },
-        { "model": "opencode-go/deepseek-v4-flash" }
+        {
+          "model": "opencode-go/minimax-m2.7"
+        },
+        {
+          "model": "opencode-go/deepseek-v4-flash"
+        }
       ],
       "mode": "primary",
       "color": "#F97316",
@@ -14,94 +18,137 @@
     "norman - (Planner)": {
       "model": "opencode-go/qwen3.6-plus",
       "fallback_models": [
-        { "model": "opencode-go/minimax-m2.7" },
-        { "model": "opencode-go/deepseek-v4-flash" }
+        {
+          "model": "opencode-go/minimax-m2.7"
+        },
+        {
+          "model": "opencode-go/deepseek-v4-flash"
+        }
       ],
       "mode": "primary",
       "color": "#2563EB",
       "description": "Planner — strategic plans and architecture before execution",
-      "tools": { "write": false, "edit": false, "bash": false }
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false
+      }
     },
     "urahara - (Oracle)": {
       "model": "opencode-go/qwen3.6-plus",
       "fallback_models": [
-        { "model": "opencode-go/minimax-m2.7" },
-        { "model": "opencode-go/deepseek-v4-flash" }
+        {
+          "model": "opencode-go/minimax-m2.7"
+        },
+        {
+          "model": "opencode-go/deepseek-v4-flash"
+        }
       ],
       "mode": "primary",
       "color": "#D97706",
       "description": "Oracle — deep analysis, tradeoffs, strategic reasoning",
-      "tools": { "write": false, "edit": false, "bash": false }
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false
+      }
     },
     "jiraiya - (Explorer)": {
       "model": "opencode-go/deepseek-v4-flash",
       "fallback_models": [
-        { "model": "opencode-go/mimo-v2.5" },
-        { "model": "opencode-go/qwen3.6-plus" }
+        {
+          "model": "opencode-go/mimo-v2.5"
+        },
+        {
+          "model": "opencode-go/qwen3.6-plus"
+        }
       ],
       "mode": "primary",
       "color": "#059669",
-      "description": "Explorer — codebase navigation, file search, pattern discovery",
-      "tools": { "write": false, "edit": false }
+      "description": "Explorer & Librarian — codebase navigation, file search, pattern discovery, reference lookup",
+      "tools": {
+        "write": false,
+        "edit": false
+      }
     },
     "senku - (Coder)": {
       "model": "opencode-go/deepseek-v4-flash",
       "fallback_models": [
-        { "model": "opencode-go/mimo-v2.5-pro" },
-        { "model": "opencode-go/qwen3.6-plus" }
+        {
+          "model": "opencode-go/mimo-v2.5-pro"
+        },
+        {
+          "model": "opencode-go/qwen3.6-plus"
+        }
       ],
       "mode": "primary",
       "color": "#DC2626",
       "description": "Coder — precise implementation, edits and writes code"
     },
-    "killua - (Quick)": {
+    "killua - (Verifier)": {
       "model": "opencode-go/deepseek-v4-flash",
       "fallback_models": [
-        { "model": "opencode-go/mimo-v2.5" },
-        { "model": "opencode-go/qwen3.6-plus" }
+        {
+          "model": "opencode-go/mimo-v2.5"
+        },
+        {
+          "model": "opencode-go/qwen3.6-plus"
+        }
       ],
       "mode": "primary",
       "color": "#6B7280",
-      "description": "Quick — fast isolated tasks: renames, typos, simple edits"
+      "description": "Verifier — runs tsc, lint, tests and build; reports results only",
+      "tools": {
+        "write": false,
+        "edit": false
+      }
     },
     "gilgamesh - (Plan Reviewer)": {
       "model": "opencode-go/qwen3.6-plus",
       "fallback_models": [
-        { "model": "opencode-go/minimax-m2.7" },
-        { "model": "opencode-go/deepseek-v4-flash" }
+        {
+          "model": "opencode-go/minimax-m2.7"
+        },
+        {
+          "model": "opencode-go/deepseek-v4-flash"
+        }
       ],
       "mode": "subagent",
       "color": "#B45309",
       "description": "Plan Reviewer — ruthless critic, finds gaps and risks",
-      "tools": { "write": false, "edit": false, "bash": false }
-    },
-    "index - (Librarian)": {
-      "model": "opencode-go/deepseek-v4-flash",
-      "fallback_models": [
-        { "model": "opencode-go/qwen3.6-plus" },
-        { "model": "opencode-go/mimo-v2.5" }
-      ],
-      "mode": "subagent",
-      "color": "#0891B2",
-      "description": "Librarian — reference lookup, docs, usage examples",
-      "tools": { "write": false, "edit": false }
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false
+      }
     },
     "gaara - (Guardian)": {
       "model": "opencode-go/deepseek-v4-flash",
       "fallback_models": [
-        { "model": "opencode-go/mimo-v2.5" },
-        { "model": "opencode-go/qwen3.6-plus" }
+        {
+          "model": "opencode-go/mimo-v2.5"
+        },
+        {
+          "model": "opencode-go/qwen3.6-plus"
+        }
       ],
       "mode": "subagent",
       "color": "#C2956B",
       "description": "Guardian — repo-identity & boundary checks before writes/commits",
-      "tools": { "write": false, "edit": false }
+      "tools": {
+        "write": false,
+        "edit": false
+      }
     },
     "rock-lee - (Executor)": {
       "model": "opencode-go/deepseek-v4-flash",
       "fallback_models": [
-        { "model": "opencode-go/mimo-v2.5-pro" },
-        { "model": "opencode-go/qwen3.6-plus" }
+        {
+          "model": "opencode-go/mimo-v2.5-pro"
+        },
+        {
+          "model": "opencode-go/qwen3.6-plus"
+        }
       ],
       "mode": "subagent",
       "color": "#16A34A",
@@ -110,8 +157,12 @@
     "kakashi - (Deep Worker)": {
       "model": "opencode-go/qwen3.6-plus",
       "fallback_models": [
-        { "model": "opencode-go/deepseek-v4-flash" },
-        { "model": "opencode-go/mimo-v2.5-pro" }
+        {
+          "model": "opencode-go/deepseek-v4-flash"
+        },
+        {
+          "model": "opencode-go/mimo-v2.5-pro"
+        }
       ],
       "mode": "primary",
       "color": "#0EA5E9",
@@ -120,13 +171,21 @@
     "gojo - (Vision)": {
       "model": "opencode-go/mimo-v2.5",
       "fallback_models": [
-        { "model": "opencode-go/qwen3.7-plus" },
-        { "model": "opencode-go/mimo-v2.5-pro" }
+        {
+          "model": "opencode-go/qwen3.7-plus"
+        },
+        {
+          "model": "opencode-go/mimo-v2.5-pro"
+        }
       ],
       "mode": "subagent",
       "color": "#7C3AED",
       "description": "Vision — analyzes screenshots, images, and visual content",
-      "tools": { "write": false, "edit": false, "bash": false }
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false
+      }
     }
   },
   "browser_automation_engine": {

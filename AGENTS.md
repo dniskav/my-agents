@@ -16,12 +16,11 @@ The plugin lives at `plugin/my-agents/`. Configuration variants (eco/smart/optim
 | **norman** | Primary | Planner — interviews, produces rigorous plans, validates with gilgamesh |
 | **kakashi** | Primary | Deep Worker — autonomous end-to-end: explore → implement → QA solo |
 | **urahara** | Subagent | Oracle — architecture decisions, tradeoffs, strategic reasoning |
-| **jiraiya** | Subagent | Explorer — codebase navigation, file search, pattern discovery |
+| **jiraiya** | Subagent | Explorer & Librarian — codebase navigation, file search, pattern discovery, reference lookup |
 | **senku** | Subagent | Coder — precise surgical implementation, 1-2 files |
 | **rock-lee** | Subagent | Executor — persistent multi-file implementation until fully done |
-| **killua** | Subagent | Quick — fast isolated tasks: renames, typos, one-liners |
+| **killua** | Subagent | Verifier — runs tsc, lint, tests and build; reports results only (read-only) |
 | **gilgamesh** | Subagent | Plan Reviewer — ruthless critic, APPROVED / REVISIONS NEEDED / REJECTED |
-| **index** | Subagent | Librarian — internal reference lookup, docs, usage examples |
 | **gojo** | Subagent | Vision — screenshots, images, PDFs, diagrams |
 | **gaara** | Subagent | Guardian — repo-identity & boundary checks before writes/commits (read-only) |
 
