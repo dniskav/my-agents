@@ -1,0 +1,187 @@
+# Context System Guide
+
+## Quick Reference
+
+**Golden Rule**: Fetch context when needed, not before (lazy loading)
+
+**Key Principle**: Use context index for discovery, load specific files as needed
+
+**Index Location**: `~/.config/opencode/context/index.md` - Quick map of all contexts
+
+**Structure**: standards/ (quality + analysis), workflows/ (process + review), system/ (internals)
+
+**Session Location**: `.tmp/sessions/{timestamp}-{task-slug}/context.md`
+
+---
+
+## Overview
+
+Context files provide guidelines and templates for specific tasks. Use the index system for efficient discovery and lazy loading to keep prompts lean.
+
+## Context Index System
+
+**Central Index**: `~/.config/opencode/context/index.md` - Ultra-compact map of all contexts
+
+The index provides:
+- Quick map for common tasks (code, docs, tests, review, delegation)
+- Triggers/keywords for each context
+- Dependencies between contexts
+- Priority levels (critical, high, medium)
+
+### Available Context Files
+
+All files are in `~/.config/opencode/context/core/` with organized subfolders:
+
+### Standards (Quality Guidelines + Analysis)
+- `standards/code.md` - Code patterns and conventions for TypeScript, Python, C# [critical]
+- `standards/docs.md` - Documentation standards [critical]
+- `standards/tests.md` - Testing principles and patterns [critical]
+- `standards/analysis.md` - Analysis framework [high]
+
+### Workflows (Process Templates + Review)
+- `workflows/delegation.md` - Delegation template [high]
+- `workflows/task-breakdown.md` - Task breakdown with examples [high]
+- `workflows/sessions.md` - Session lifecycle [medium]
+- `workflows/review.md` - Code review guidelines [high]
+
+### Root
+- `essential-patterns.md` - Universal cross-stack patterns quick reference [high]
+
+## How to Use the Index
+
+**Step 1: Check Quick Map** (for common tasks)
+- Code task? → Load `standards/code.md`
+- Docs task? → Load `standards/docs.md`
+- Review task? → Load `workflows/review.md`
+
+**Step 2: Load Index** (for keyword matching)
+- Load `~/.config/opencode/context/index.md`
+- Scan triggers to find relevant contexts
+- Load specific context files as needed
+
+**Step 3: Load Dependencies**
+- Check `deps:` in index
+- Load dependent contexts for complete guidelines
+
+**Benefits:**
+- No prompt bloat (index is only ~120 tokens)
+- Fetch only what's relevant
+- Faster for simple tasks
+- Clear dependency tracking
+
+## When to Use Each File
+
+### `~/.config/opencode/context/core/standards/code.md`
+- Writing new code (TypeScript, Python, C#)
+- Modifying existing code
+- Making architectural decisions
+- Following project conventions
+
+### `~/.config/opencode/context/core/standards/docs.md`
+- Writing README files
+- Creating API documentation
+- Adding code comments
+
+### `~/.config/opencode/context/core/standards/tests.md`
+- Writing tests
+- Choosing test strategy
+- Debugging test failures
+
+### `~/.config/opencode/context/core/standards/analysis.md`
+- Analyzing codebase patterns
+- Investigating bugs
+- Evaluating architecture
+
+### `~/.config/opencode/context/core/workflows/delegation.md`
+- Delegating to a subagent
+- Creating task context files
+- Multi-file coordination
+
+### `~/.config/opencode/context/core/workflows/task-breakdown.md`
+- Complex features with multiple components
+- Tasks with clear dependencies
+- Effort > 60 minutes or 4+ files
+
+### `~/.config/opencode/context/core/workflows/sessions.md`
+- Session lifecycle
+- Cleanup procedures
+- Session isolation
+
+### `~/.config/opencode/context/core/workflows/review.md`
+- Reviewing code
+- Conducting code audits
+- Providing PR feedback
+
+## Temporary Context (Session-Specific)
+
+When delegating, create focused task context:
+
+**Location**: `.tmp/sessions/{timestamp}-{task-slug}/context.md`
+
+**Structure**:
+```markdown
+# Task Context: {Task Name}
+
+Session ID: {id}
+Created: {timestamp}
+Status: in_progress
+
+## Current Request
+{What user asked for}
+
+## Requirements
+- {requirement 1}
+- {requirement 2}
+
+## Decisions Made
+- {decision 1}
+
+## Files to Modify/Create
+- {file 1} - {purpose}
+
+## Static Context Available
+- ~/.config/opencode/context/core/standards/code.md
+- ~/.config/opencode/context/core/standards/tests.md
+
+## Constraints/Notes
+{Important context}
+
+## Progress
+- [ ] {task 1}
+- [ ] {task 2}
+
+---
+**Instructions for Subagent:**
+{Specific instructions}
+```
+
+## Session Management
+
+### Session Structure
+```
+.tmp/sessions/{session-id}/
+├── context.md          # Task context
+├── notes.md            # Working notes
+└── artifacts/          # Generated files
+```
+
+### Session ID Format
+`{timestamp}-{random-4-chars}`
+Example: `20250119-143022-a4f2`
+
+### Cleanup
+- Ask user before deleting session files
+- Remove after task completion
+- Keep if user wants to review
+
+## Best Practices
+
+✅ Use index for context discovery
+✅ Load only relevant context files
+✅ Check dependencies in index
+✅ Create temp context when delegating
+✅ Clean up sessions after completion
+✅ Reference specific sections when possible
+✅ Keep temp context focused and concise
+
+**Golden Rule**: Fetch context when needed, not before.

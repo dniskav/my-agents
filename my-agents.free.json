@@ -1,0 +1,139 @@
+{
+  "$schema": "./my-agents.schema.json",
+  "agents": {
+    "rimuru - (Orchestrator)": {
+      "model": "opencode/nemotron-3-ultra-free",
+      "fallback_models": [
+        { "model": "opencode/big-pickle" },
+        { "model": "opencode/deepseek-v4-flash-free" }
+      ],
+      "mode": "primary",
+      "color": "#F97316",
+      "description": "Orchestrator — complex multi-step tasks, delegates to specialists"
+    },
+    "norman - (Planner)": {
+      "model": "opencode/nemotron-3-ultra-free",
+      "fallback_models": [
+        { "model": "opencode/big-pickle" },
+        { "model": "opencode/deepseek-v4-flash-free" }
+      ],
+      "mode": "primary",
+      "color": "#2563EB",
+      "description": "Planner — strategic plans and architecture before execution",
+      "tools": { "write": false, "edit": false, "bash": false }
+    },
+    "urahara - (Oracle)": {
+      "model": "opencode/nemotron-3-ultra-free",
+      "fallback_models": [
+        { "model": "opencode/big-pickle" },
+        { "model": "opencode/deepseek-v4-flash-free" }
+      ],
+      "mode": "primary",
+      "color": "#D97706",
+      "description": "Oracle — deep analysis, tradeoffs, strategic reasoning",
+      "tools": { "write": false, "edit": false, "bash": false }
+    },
+    "jiraiya - (Explorer)": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "fallback_models": [
+        { "model": "opencode/north-mini-code-free" },
+        { "model": "opencode/mimo-v2.5-free" }
+      ],
+      "mode": "primary",
+      "color": "#059669",
+      "description": "Explorer — codebase navigation, file search, pattern discovery",
+      "tools": { "write": false, "edit": false }
+    },
+    "senku - (Coder)": {
+      "model": "opencode/big-pickle",
+      "fallback_models": [
+        { "model": "opencode/nemotron-3-ultra-free" },
+        { "model": "opencode/north-mini-code-free" }
+      ],
+      "mode": "primary",
+      "color": "#DC2626",
+      "description": "Coder — precise implementation, edits and writes code"
+    },
+    "killua - (Quick)": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "fallback_models": [
+        { "model": "opencode/north-mini-code-free" },
+        { "model": "opencode/mimo-v2.5-free" }
+      ],
+      "mode": "primary",
+      "color": "#6B7280",
+      "description": "Quick — fast isolated tasks: renames, typos, simple edits"
+    },
+    "gilgamesh - (Plan Reviewer)": {
+      "model": "opencode/big-pickle",
+      "fallback_models": [
+        { "model": "opencode/nemotron-3-ultra-free" },
+        { "model": "opencode/deepseek-v4-flash-free" }
+      ],
+      "mode": "subagent",
+      "color": "#B45309",
+      "description": "Plan Reviewer — ruthless critic, finds gaps and risks",
+      "tools": { "write": false, "edit": false, "bash": false }
+    },
+    "index - (Librarian)": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "fallback_models": [
+        { "model": "opencode/mimo-v2.5-free" },
+        { "model": "opencode/north-mini-code-free" }
+      ],
+      "mode": "subagent",
+      "color": "#0891B2",
+      "description": "Librarian — reference lookup, docs, usage examples",
+      "tools": { "write": false, "edit": false }
+    },
+    "gaara - (Guardian)": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "fallback_models": [
+        { "model": "opencode/north-mini-code-free" },
+        { "model": "opencode/mimo-v2.5-free" }
+      ],
+      "mode": "subagent",
+      "color": "#C2956B",
+      "description": "Guardian — repo-identity & boundary checks before writes/commits",
+      "tools": { "write": false, "edit": false }
+    },
+    "rock-lee - (Executor)": {
+      "model": "opencode/big-pickle",
+      "fallback_models": [
+        { "model": "opencode/nemotron-3-ultra-free" },
+        { "model": "opencode/deepseek-v4-flash-free" }
+      ],
+      "mode": "subagent",
+      "color": "#16A34A",
+      "description": "Executor — relentless implementation, no shortcuts, keeps going until fully done"
+    },
+    "kakashi - (Deep Worker)": {
+      "model": "opencode/nemotron-3-ultra-free",
+      "fallback_models": [
+        { "model": "opencode/big-pickle" },
+        { "model": "opencode/deepseek-v4-flash-free" }
+      ],
+      "mode": "primary",
+      "color": "#0EA5E9",
+      "description": "Deep Worker — autonomous end-to-end execution: explores, plans, implements, verifies and QAs solo"
+    },
+    "gojo - (Vision)": {
+      "model": "opencode/mimo-v2.5-free",
+      "fallback_models": [
+        { "model": "opencode/big-pickle" },
+        { "model": "opencode/nemotron-3-ultra-free" }
+      ],
+      "mode": "subagent",
+      "color": "#7C3AED",
+      "description": "Vision — analyzes screenshots, images, and visual content",
+      "tools": { "write": false, "edit": false, "bash": false }
+    }
+  },
+  "browser_automation_engine": {
+    "provider": "agent-browser"
+  },
+  "git_master": {
+    "commit_footer": false,
+    "include_co_authored_by": false
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "my-agents-config",
+  "title": "My Agents Configuration",
+  "description": "Configuration for the custom OpenCode agents plugin",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "agents": {
+      "type": "object",
+      "description": "Named agents. Keys are displayed as-is in the agent tab (e.g. 'rimuru - (Orchestrator)').",
+      "additionalProperties": { "$ref": "#/$defs/AgentConfig" }
+    },
+    "browser_automation_engine": {
+      "type": "object",
+      "description": "Configures which skill/agent handles browser automation tasks.",
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "Skill name registered in OpenCode (e.g. 'agent-browser')"
+        }
+      }
+    },
+    "git_master": {
+      "type": "object",
+      "description": "Controls how agents produce git commits.",
+      "additionalProperties": false,
+      "properties": {
+        "commit_footer": {
+          "type": "boolean",
+          "description": "Add an AI-generated footer to commit messages (default: false)"
+        },
+        "include_co_authored_by": {
+          "type": "boolean",
+          "description": "Append 'Co-Authored-By: AI' trailer to commits (default: false)"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "ModelRef": {
+      "type": "object",
+      "required": ["model"],
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "Model ID in provider/model-name format (e.g. 'opencode-go/kimi-k2.6')"
+        }
+      }
+    },
+    "AgentConfig": {
+      "type": "object",
+      "required": ["model"],
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "Primary model ID"
+        },
+        "fallback_models": {
+          "type": "array",
+          "description": "Models to try if the primary is unavailable or fails",
+          "items": { "$ref": "#/$defs/ModelRef" }
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["primary", "subagent", "all"],
+          "description": "'primary' = visible in tab, 'subagent' = only callable via delegate_task"
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Hex color shown in the agent tab and toasts (e.g. '#F97316')"
+        },
+        "description": {
+          "type": "string",
+          "description": "One-line description shown when selecting the agent"
+        },
+        "tools": {
+          "type": "object",
+          "description": "Tool enable/disable map. Set a tool to false to block it for this agent.",
+          "additionalProperties": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}
