@@ -38,7 +38,7 @@ delegate_task(
 TASK DESCRIPTION: {task}
 EXPECTED OUTCOME: A list of subtasks with:
 - title and description
-- which specialist to use (Senku/jiraiya/killua/gilgamesh/index/gojo)
+- which specialist to use (Senku/Jiraiya/Neji/Gilgamesh/Gojo)
 - dependencies (which tasks must complete before this one can start)
 MUST DO: group independent tasks so they can run in parallel"
 )
@@ -84,9 +84,9 @@ delegate_task(agent: "Senku", task: "X") → wait → delegate_task(agent: "Senk
 |---|---|
 | File exploration, search | `Jiraiya` |
 | Code implementation | `Senku` |
-| Quick single edits | `killua` |
+| Quality checks (tsc/lint/tests) | `Neji` |
 | Plan or result review | `Gilgamesh` |
-| Docs, references | `index` |
+| Docs, references | `Jiraiya` |
 | Visual analysis | `Gojo` |
 
 ### Progress reporting

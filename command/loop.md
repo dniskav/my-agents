@@ -47,7 +47,7 @@ Repeat until exit. Each iteration:
 2. **Execute** — delegate the next concrete step toward the goal. Route by content:
    - implementation → `Senku` (precise) or `Rock-Lee` (persistent/multi-file)
    - exploration needed → `Jiraiya`
-   - quick fix → `killua`
+   - quick fix → `Senku`
    Always pass `directory` (if set) and the notepad. Use the 6-section task format.
 
 3. **Verify the done-criterion** — run it directly (bash) when mechanical (tests/build/lint), or delegate to `Gilgamesh` for judgment-based criteria.

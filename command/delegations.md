@@ -63,7 +63,7 @@ Each delegation's full transcript (the prompt sent + the agent's complete respon
   ```
   If multiple matches, show the most recent (or list them and ask which).
 
-This is how you inspect WHAT Gilgamesh actually reasoned, even though it ran as a nested session. (For watching it run LIVE, read-only agents like Gilgamesh/jiraiya/gaara/index are flattened to the root session and appear in `Ctrl+X ↓`.)
+This is how you inspect WHAT Gilgamesh actually reasoned, even though it ran as a nested session. (For watching it run LIVE, read-only agents like Gilgamesh/jiraiya/gaara/neji are flattened to the root session and appear in `Ctrl+X ↓`.)
 
 ### 4. Summary line
 

@@ -17,10 +17,10 @@
 | **Jiraiya** | Subagent | Navigate codebase, find files, patterns, symbols | `deepseek-v4-flash` |
 | **Senku** | Subagent | Precise and surgical implementation | `mimo-v2.5-pro` |
 | **Rock-Lee** | Subagent | Persistent multi-file implementation until fully done | `mimo-v2.5-pro` |
-| **killua** | Subagent | Fast isolated tasks: renames, typos, simple edits | `deepseek-v4-flash` |
+| **Neji** | Subagent | Run tsc, lint, tests, build — report results only (read-only) | `deepseek-v4-flash` |
 | **Gilgamesh** | Subagent | Review plans and implementations, find gaps and risks | `minimax-m2.7` |
-| **index** | Subagent | Find references, docs and usage examples in the codebase | `qwen3.6-plus` |
 | **Gojo** | Subagent | Analyze screenshots, images, PDFs and diagrams | `mimo-v2.5` |
+| **Gaara** | Subagent | Verify repo identity and boundaries before any write/commit (read-only) | `deepseek-v4-flash` |
 
 ---
 
@@ -50,7 +50,7 @@
 
 **Jiraiya** ← Rimuru / Kakashi
 > *"Find every place authentication is handled and what patterns they use"*
-> → Rimuru calls Jiraiya before planning any feature that touches existing code, so Senku doesn't have to discover the codebase alone.
+> → Rimuru calls Jiraiya before planning any feature that touches existing code, so Senku doesn't have to discover the codebase alone. Also covers reference lookup and usage examples (previously handled by index).
 
 **Senku** ← Rimuru
 > *"Edit `src/middleware/auth.ts` to add refresh token validation following the pattern in `src/middleware/csrf.ts`"*
@@ -60,21 +60,21 @@
 > *"Replace all uses of the deprecated `useAuth()` hook with `useSession()` across the 14 components that use it"*
 > → Rimuru delegates to Rock-Lee when many files are involved or obstacles are likely to come up during execution.
 
-**killua** ← Rimuru
-> *"Rename the variable `usr` to `user` in `auth.ts` line 42"*
-> → Rimuru delegates to killua when the task is so simple it doesn't justify the overhead of Senku.
+**Neji** ← Rimuru / Kakashi
+> *"Run tsc and the test suite on the current state of the repo"*
+> → Rimuru calls Neji after every implementation round to verify the build is clean before closing the task. Neji reports only — never edits.
 
 **Gilgamesh** ← Norman / Rimuru
 > *"Review this database migration plan before we execute it"*
 > → Norman calls it before delivering any complex plan. Rimuru calls it after receiving the plan from Norman and before executing.
 
-**index** ← Rimuru / Kakashi
-> *"How is the Repository pattern implemented in this codebase? Give me examples with file:line"*
-> → Any agent calls it when they need to know how something is done *here*, without having to explore the full codebase.
-
 **Gojo** ← Rimuru / Kakashi
 > *"The user attached a mockup of the new dashboard — describe its structure and the components we need"*
 > → Rimuru or Kakashi call it when there's an image or PDF to interpret before planning or implementing.
+
+**Gaara** ← Rimuru / Kakashi
+> *"We're about to write to this directory — confirm it's the neuron library and not the neuron app"*
+> → Called before any write or commit when the session spans multiple projects or the target repo is ambiguous. Read-only — verdicts only, never edits.
 
 ---
 ---
@@ -92,10 +92,10 @@
 | **Jiraiya** | Subagente | Navegar el codebase, encontrar archivos, patrones, símbolos | `deepseek-v4-flash` |
 | **Senku** | Subagente | Implementación precisa y quirúrgica | `mimo-v2.5-pro` |
 | **Rock-Lee** | Subagente | Implementación persistente multi-archivo hasta completar | `mimo-v2.5-pro` |
-| **killua** | Subagente | Tareas rápidas aisladas: renombrar, typos, edits simples | `deepseek-v4-flash` |
+| **Neji** | Subagente | Ejecutar tsc, lint, tests, build — solo reporta resultados (solo lectura) | `deepseek-v4-flash` |
 | **Gilgamesh** | Subagente | Revisar planes e implementaciones, encontrar gaps y riesgos | `minimax-m2.7` |
-| **index** | Subagente | Buscar referencias, docs y ejemplos de uso en el codebase | `qwen3.6-plus` |
 | **Gojo** | Subagente | Analizar screenshots, imágenes, PDFs y diagramas | `mimo-v2.5` |
+| **Gaara** | Subagente | Verificar identidad del repo y límites antes de cualquier escritura/commit (solo lectura) | `deepseek-v4-flash` |
 
 ---
 
@@ -125,7 +125,7 @@
 
 **Jiraiya** ← Rimuru / Kakashi
 > *"Encuentra todos los lugares donde se maneja autenticación y qué patrones usan"*
-> → Rimuru llama a Jiraiya antes de planear cualquier feature que toque código existente, para que Senku no tenga que descubrir el codebase solo.
+> → Rimuru llama a Jiraiya antes de planear cualquier feature que toque código existente, para que Senku no tenga que descubrir el codebase solo. También cubre búsqueda de referencias y ejemplos de uso (rol que antes tenía index).
 
 **Senku** ← Rimuru
 > *"Edita `src/middleware/auth.ts` para agregar validación de token de refresh según el patrón en `src/middleware/csrf.ts`"*
@@ -135,18 +135,18 @@
 > *"Reemplaza todos los usos del hook deprecated `useAuth()` por `useSession()` en los 14 componentes que lo usan"*
 > → Rimuru lo delega cuando hay muchos archivos involucrados o es probable que surjan obstáculos durante la ejecución.
 
-**killua** ← Rimuru
-> *"Renombra la variable `usr` a `user` en `auth.ts` línea 42"*
-> → Rimuru lo delega cuando la tarea es tan simple que no justifica el overhead de Senku.
+**Neji** ← Rimuru / Kakashi
+> *"Ejecuta tsc y la suite de tests sobre el estado actual del repo"*
+> → Rimuru llama a Neji después de cada ronda de implementación para verificar que el build está limpio antes de cerrar la tarea. Solo reporta — nunca edita.
 
 **Gilgamesh** ← Norman / Rimuru
 > *"Revisa este plan de migración de base de datos antes de que lo ejecutemos"*
 > → Norman lo llama antes de entregar cualquier plan complejo. Rimuru lo llama después de recibir el plan de Norman y antes de ejecutar.
 
-**index** ← Rimuru / Kakashi
-> *"¿Cómo se implementa el patrón Repository en este codebase? Dame ejemplos con file:line"*
-> → Cualquier agente lo llama cuando necesita saber cómo algo se hace *aquí*, sin tener que explorar el codebase completo.
-
 **Gojo** ← Rimuru / Kakashi
 > *"El usuario adjuntó un mockup del nuevo dashboard — describe la estructura y los componentes que necesitamos"*
 > → Rimuru o Kakashi lo llaman cuando hay una imagen o PDF que interpretar antes de poder planear o implementar.
+
+**Gaara** ← Rimuru / Kakashi
+> *"Vamos a escribir en este directorio — confirma que es la librería neuron y no la app neuron"*
+> → Se llama antes de cualquier escritura o commit cuando la sesión abarca múltiples proyectos o el repo destino es ambiguo. Solo lectura — emite veredictos, nunca edita.

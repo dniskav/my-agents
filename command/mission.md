@@ -151,9 +151,9 @@ Route each step based on content:
 |---|---|
 | File exploration, codebase search | `Jiraiya` |
 | Code implementation, edits | `Senku` |
-| Quick isolated changes | `killua` |
+| Quality checks (tsc/lint/tests) | `Neji` |
 | Plan or result review | `Gilgamesh` |
-| Reference lookups, docs | `index` |
+| Reference lookups, docs | `Jiraiya` |
 | Visual/image analysis | `Gojo` |
 
 Example parallel execution:
@@ -231,11 +231,11 @@ STOP. Wait for user.
 
 ## Phase 7: Closure
 
-### Documentation → delegate to index
+### Documentation → delegate to Jiraiya
 
 ```
 delegate_task(
-  agent: "index",
+  agent: "Jiraiya",
   task: "TASK: Write brief documentation for all new public components/functions created during this mission.
 CONTEXT: see .tmp/sessions/{session-id}/execution-report.md for the list of new files
 MUST DO: follow the existing documentation style found in the project"
