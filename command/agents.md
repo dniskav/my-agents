@@ -66,6 +66,21 @@ echo "  To switch: /agents eco  |  /agents smart  |  /agents optimal"
 
 ---
 
+## free
+
+```bash
+cp ~/.config/opencode/my-agents.free.json ~/.config/opencode/my-agents.json
+echo "free" > ~/.config/opencode/.agent-mode
+echo "✓ Switched to FREE — zero cost (opencode zen models)"
+echo "  Rimuru/urahara/norman/kakashi → nemotron-3-ultra-free"
+echo "  Senku/rock-lee/gilgamesh      → big-pickle"
+echo "  Jiraiya/neji/gaara            → deepseek-v4-flash-free"
+echo "  Gojo                          → mimo-v2.5-free"
+echo "⚠ Restart OpenCode to apply changes"
+```
+
+---
+
 ## eco
 
 ```bash
