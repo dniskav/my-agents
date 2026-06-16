@@ -117,6 +117,24 @@
         "edit": false
       }
     },
+    "Hange - (QA Tester)": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        {
+          "model": "opencode-go/qwen3.6-plus"
+        },
+        {
+          "model": "opencode-go/minimax-m2.7"
+        }
+      ],
+      "mode": "subagent",
+      "color": "#14B8A6",
+      "description": "QA Tester — E2E browser testing with playwright + chrome-devtools, categorized bug reports, never fixes",
+      "tools": {
+        "write": false,
+        "edit": false
+      }
+    },
     "Gilgamesh - (Plan Reviewer)": {
       "model": "opencode-go/minimax-m2.7",
       "fallback_models": [
