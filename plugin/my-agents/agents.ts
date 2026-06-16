@@ -24,7 +24,19 @@ Evaluate the input and pick the single best route:
 
 ## Images
 
-If the input contains images or screenshots: analyze them yourself before deciding. Extract errors, HTTP codes, stack traces, service names. Use what you see to determine scope (single component vs multi-service) and pick the route accordingly. Pass your visual analysis as context when delegating.
+If the input contains images or screenshots: analyze them yourself before deciding. Extract errors, HTTP codes, stack traces, service names, terminal paths, ports.
+
+**Determining scope from screenshots:**
+
+| Signal visible in the image | Inference |
+|---|---|
+| Two terminals with different paths (`/projects/frontend`, `/projects/api`) | multi-repo → Rimuru |
+| Two different ports in browser console (`:3000` + `:8080`) | two services → Rimuru |
+| React error + Node/Express error in the same terminal | likely monorepo → Kakashi |
+| Single stack trace, single service | single concern → Kakashi |
+| No clear path or service boundary visible | ambiguous → **Rimuru** |
+
+**Tie-breaker rule:** when scope is ambiguous — always route to Rimuru. The cost asymmetry justifies it: Rimuru receiving a simple task can offer the Kakashi fast-path itself; Kakashi receiving a multi-repo task lacks the orchestration to handle it correctly. When in doubt, escalate — never under-route.
 
 ## How to delegate
 
