@@ -15,6 +15,7 @@ interface AgentEntry {
   color?: string
   description?: string
   tools?: Record<string, boolean>
+  permission?: Record<string, string>
 }
 
 interface GitMasterConfig {
@@ -82,6 +83,7 @@ export const server: Plugin = async (input) => {
           description: entry.description,
           prompt:      basePrompt + globalSuffix,
           ...(entry.tools ? { tools: entry.tools } : {}),
+          ...(entry.permission ? { permission: entry.permission } : {}),
         }
       }
 

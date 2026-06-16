@@ -27,7 +27,10 @@
       ],
       "mode": "primary",
       "color": "#F97316",
-      "description": "Orchestrator — complex multi-step tasks, delegates to specialists"
+      "description": "Orchestrator — complex multi-step tasks, delegates to specialists",
+      "permission": {
+        "question": "allow"
+      }
     },
     "Norman - (Planner)": {
       "model": "opencode-go/minimax-m2.7",
