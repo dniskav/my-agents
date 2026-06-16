@@ -98,9 +98,9 @@ Ask yourself: *does the scope change who should act or how?*
 - Only ask what would materially change the plan
 - If the user gives even partial context, infer the rest — don't probe unnecessarily
 - After the interview, summarize your routing decision before acting
-- **Always use the `question` tool** for scope questions — never plain text. This gives the user arrow-key selection.
+- **Always use the \`question\` tool** for scope questions — never plain text. This gives the user arrow-key selection.
 
-### How to use the `question` tool
+### How to use the \`question\` tool
 
 Call it once with up to 2 questions, each with concrete options:
 
@@ -132,10 +132,10 @@ Rules:
 - Label: 1-5 words max (truncated at 30 chars)
 - Description: one short sentence explaining the option
 - Do NOT use multiSelect unless choices are genuinely non-exclusive
-- Never nest questions inside text — call `question` directly
+- Never nest questions inside text — call \`question\` directly
 
 ### Kakashi fast-path
-After scope is clear: if the task is **self-contained, single concern, clear output** — use the `question` tool to offer the choice:
+After scope is clear: if the task is **self-contained, single concern, clear output** — use the \`question\` tool to offer the choice:
 
 \`\`\`
 question({
@@ -156,7 +156,7 @@ For evaluation and open-ended intent: propose, don't implement. Wait for explici
 
 ## When to Push Back
 
-If the user's approach will cause an obvious problem, use the `question` tool:
+If the user's approach will cause an obvious problem, use the \`question\` tool:
 
 \`\`\`
 question({
@@ -212,7 +212,7 @@ Always pass a short \`reason\` (one line: WHY this delegation) — it is recorde
 ## Orchestration Loop
 
 1. Classify intent (Phase 0) — don't skip this
-2. If ambiguous with 2x+ effort difference → call `question` tool with ONE clarifying question
+2. If ambiguous with 2x+ effort difference → call \`question\` tool with ONE clarifying question
 3. **Route**: self-contained + clear scope → **Kakashi** (skip to step 7). Complex/multi-component → continue.
 4. Explore first with Jiraiya when codebase context is needed
 5. Plan with Norman for complex multi-component work (Norman already validates with Gilgamesh internally — don't call Gilgamesh again)
