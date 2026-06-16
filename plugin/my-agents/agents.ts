@@ -30,8 +30,8 @@ If the input contains images or screenshots: analyze them yourself before decidi
 
 | Signal visible in the image | Inference |
 |---|---|
-| Two terminals with different paths (`/projects/frontend`, `/projects/api`) | multi-repo → Rimuru |
-| Two different ports in browser console (`:3000` + `:8080`) | two services → Rimuru |
+| Two terminals with different paths (/projects/frontend, /projects/api) | multi-repo → Rimuru |
+| Two different ports in browser console (:3000 + :8080) | two services → Rimuru |
 | React error + Node/Express error in the same terminal | likely monorepo → Kakashi |
 | Single stack trace, single service | single concern → Kakashi |
 | No clear path or service boundary visible | ambiguous → **Rimuru** |

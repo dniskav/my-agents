@@ -15,8 +15,12 @@ const READ_ONLY_AGENTS = new Set([
   "Neji - (Verifier)",
 ])
 
+// Agents that exist in the system but cannot be delegated to programmatically.
+// Aizen is the user-facing entry point — calling it from inside the harness
+// would create a routing loop with no value.
+const DISPATCH_ONLY_AGENTS = new Set(["aizen"])
+
 const AGENT_ALIASES: Record<string, string> = {
-  Aizen:     "Aizen - (Dispatcher)",
   Rimuru:    "Rimuru - (Orchestrator)",
   Norman:    "Norman - (Planner)",
   Urahara:   "Urahara - (Oracle)",
@@ -181,7 +185,7 @@ subagent will run in the wrong working directory.`,
     args: {
       agent: tool.schema
         .string()
-        .describe("Short agent name: Aizen | Rimuru | Norman | Urahara | Jiraiya | Kakashi | Senku | Rock-Lee | Neji | Gilgamesh | Gojo | Gaara"),
+        .describe("Short agent name: Rimuru | Norman | Urahara | Jiraiya | Kakashi | Senku | Rock-Lee | Neji | Gilgamesh | Gojo | Gaara"),
       task: tool.schema
         .string()
         .describe("Full task description — be explicit, include all needed context inline. Use the 6-section format when delegating complex work: TASK / EXPECTED OUTCOME / TOOLS TO USE / MUST DO / MUST NOT DO / CONTEXT"),
@@ -213,6 +217,14 @@ subagent will run in the wrong working directory.`,
 
     async execute({ agent, task, context, reason, notepadPath, directory, timeoutMs, background }, ctx) {
       const normalized = agent.toLowerCase().trim()
+
+      if (DISPATCH_ONLY_AGENTS.has(normalized)) {
+        return {
+          output: `⛔ Cannot delegate to Aizen — it is the user-facing entry point, not a subagent. ` +
+                  `Aizen routes tasks to the squad; the squad does not route back to Aizen.`,
+        }
+      }
+
       const agentKey =
         Object.entries(AGENT_ALIASES).find(([k]) => k.toLowerCase() === normalized)?.[1] ?? agent
       const workdir = directory ?? ctx.directory

@@ -1,6 +1,16 @@
 {
   "$schema": "./my-agents.schema.json",
   "agents": {
+    "Aizen - (Dispatcher)": {
+      "model": "opencode-go/mimo-v2.5",
+      "fallback_models": [
+        { "model": "opencode/nemotron-3-ultra-free" },
+        { "model": "opencode-go/qwen3.6-plus" }
+      ],
+      "mode": "primary",
+      "color": "#94A3B8",
+      "description": "Dispatcher — analyzes any input (text or images) and routes to the right agent instantly"
+    },
     "Rimuru - (Orchestrator)": {
       "model": "opencode/nemotron-3-ultra-free",
       "fallback_models": [
