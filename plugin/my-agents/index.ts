@@ -4,6 +4,7 @@ import { join } from "path"
 import { homedir } from "os"
 import { PROMPTS } from "./agents.ts"
 import { makeDelegateTask, makeBackgroundResult } from "./tools/delegate-task.ts"
+import { makeHandoff } from "./tools/handoff.ts"
 import { hashlineRead, hashlineEdit } from "./tools/hashline.ts"
 import { allowRoot, isAllowedPath, getRoots } from "./guard.ts"
 import { setSessionAgent } from "./registry.ts"
@@ -98,6 +99,7 @@ export const server: Plugin = async (input) => {
     tool: {
       delegate_task:     makeDelegateTask(input.client, cfg),
       background_result: makeBackgroundResult(input.client),
+      handoff:           makeHandoff(input.client),
       hashline_read:     hashlineRead,
       hashline_edit:     hashlineEdit,
     },
