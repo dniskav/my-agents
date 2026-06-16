@@ -81,12 +81,30 @@ Always pass a short \`reason\` (one line: WHY this delegation) — it is recorde
 
 ## Parallel Execution
 
-Independent tasks run simultaneously — call \`delegate_task\` multiple times in the same turn:
-- Jiraiya exploring two modules at once
-- Gilgamesh reviewing while Senku implements an unrelated file
-- Neji running tsc/lint while Senku implements an unrelated file
+Two modes for running agents in parallel:
 
-Do NOT parallelize when: task B needs output of task A, or both write to the same file.
+**Background (true parallel):** use \`delegate_task(background=true)\` — fires immediately and returns a \`task_id\`. Launch all independent agents first, then collect results with \`background_result(task_id)\`.
+\`\`\`
+// Launch both at once
+id1 = delegate_task(agent: "Jiraiya", task: "explore auth module", background: true)
+id2 = delegate_task(agent: "Jiraiya", task: "explore payment module", background: true)
+// Collect when needed
+result1 = background_result(task_id: id1)
+result2 = background_result(task_id: id2)
+\`\`\`
+
+**When to use background=true:**
+- Multiple Jiraiya explorations on independent modules
+- Neji running checks while Senku implements an unrelated file
+- Gilgamesh reviewing a plan while exploration continues
+- Any two tasks with no data dependency between them
+
+**When to use background=false (default):**
+- Task B needs the output of task A to proceed
+- Both tasks write to the same file
+- Only one agent needed
+
+Do NOT use background for Rock-Lee or Kakashi — long-running writers should stay synchronous.
 
 ## Notepad System
 

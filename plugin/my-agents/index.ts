@@ -3,7 +3,7 @@ import { readFileSync } from "fs"
 import { join } from "path"
 import { homedir } from "os"
 import { PROMPTS } from "./agents.ts"
-import { makeDelegateTask } from "./tools/delegate-task.ts"
+import { makeDelegateTask, makeBackgroundResult } from "./tools/delegate-task.ts"
 import { allowRoot, isAllowedPath, getRoots } from "./guard.ts"
 import { setSessionAgent } from "./registry.ts"
 
@@ -93,7 +93,8 @@ export const server: Plugin = async (input) => {
     },
 
     tool: {
-      delegate_task: makeDelegateTask(input.client, cfg),
+      delegate_task:     makeDelegateTask(input.client, cfg),
+      background_result: makeBackgroundResult(input.client),
     },
 
     // Trunca outputs de herramientas que tienden a ser grandes para evitar context bloat.

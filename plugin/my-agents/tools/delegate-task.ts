@@ -87,9 +87,71 @@ function writeTranscript(
   }
 }
 
+/** Shared logic: build prompt, create session, send prompt. Returns sessionID. */
+async function spawnSession(
+  client: PluginInput["client"],
+  {
+    agentKey,
+    workdir,
+    parentID,
+    prompt,
+  }: { agentKey: string; workdir: string; parentID: string; prompt: string },
+): Promise<string> {
+  const created = await client.session.create({
+    body: { parentID },
+    query: { directory: workdir },
+  })
+  const sessionID = (created.data as any)?.id as string | undefined
+  if (!sessionID) throw new Error("could not create subagent session")
+
+  await client.session.prompt({
+    path: { id: sessionID },
+    body: {
+      agent: agentKey,
+      parts: [{ type: "text", text: prompt }],
+    } as any,
+    query: { directory: workdir },
+  })
+
+  return sessionID
+}
+
+/** Shared logic: poll until idle, fetch last assistant message. */
+async function waitForResult(
+  client: PluginInput["client"],
+  sessionID: string,
+  workdir: string,
+  timeoutMs: number,
+): Promise<{ text: string; timedOut: boolean }> {
+  const maxAttempts = Math.max(1, Math.ceil(timeoutMs / 500))
+  let timedOut = false
+  for (let i = 0; i < maxAttempts; i++) {
+    await sleep(500)
+    const statusRes = await client.session.status({ query: { directory: workdir } })
+    const allStatuses = statusRes.data as Record<string, { type: string }> | undefined
+    const sessionStatus = allStatuses?.[sessionID]
+    if (!sessionStatus || sessionStatus.type === "idle") break
+    if (i === maxAttempts - 1) timedOut = true
+  }
+
+  const messagesRes = await client.session.messages({
+    path: { id: sessionID },
+    query: { directory: workdir },
+  })
+  const messages: any[] = (messagesRes.data as any) ?? []
+  const lastAssistant = [...messages].reverse().find((m: any) => m.info?.role === "assistant")
+  const text = ((lastAssistant?.parts ?? []) as any[])
+    .filter((p: any) => p.type === "text")
+    .map((p: any) => p.text ?? "")
+    .join("\n")
+    .trim()
+
+  return { text, timedOut }
+}
+
 export function makeDelegateTask(client: PluginInput["client"], cfg: AgentsConfig) {
   return tool({
-    description: `Delegate a task to a specialized subagent and wait for the full result.
+    description: `Delegate a task to a specialized subagent.
 Available agents: ${Object.keys(AGENT_ALIASES).join(", ")}.
 Use the short alias (e.g. "Senku") — the tool resolves the full name automatically.
 
@@ -105,6 +167,11 @@ Agents and when to use them:
 - Gilgamesh: review a plan or implementation for gaps and risks
 - Gojo: analyze screenshots, images, diagrams
 - Gaara: repo-identity & boundary guardian — verify you're in the right repo before writes/commits
+
+BACKGROUND MODE: set background=true to fire-and-forget — returns a task_id immediately so you
+can launch multiple agents in parallel. Retrieve results later with background_result(task_id).
+Use background=true when tasks are independent and you don't need the result before starting others.
+Use background=false (default) when the result is needed before the next step.
 
 IMPORTANT: if the task targets a DIFFERENT project than where opencode was launched,
 you MUST pass the absolute path of that project via the \`directory\` argument, or the
@@ -136,10 +203,14 @@ subagent will run in the wrong working directory.`,
       timeoutMs: tool.schema
         .number()
         .optional()
-        .describe("Max time to wait for the subagent before flagging a timeout. Defaults to 300000 (5 min). Raise it for long persistent work (Rock-Lee, Kakashi)."),
+        .describe("Max time to wait for the subagent before flagging a timeout. Defaults to 300000 (5 min). Raise it for long persistent work (Rock-Lee, Kakashi). Ignored in background mode."),
+      background: tool.schema
+        .boolean()
+        .optional()
+        .describe("Fire-and-forget mode. Returns task_id immediately — use background_result(task_id) to retrieve the result later. Use this to run independent agents in true parallel."),
     },
 
-    async execute({ agent, task, context, reason, notepadPath, directory, timeoutMs }, ctx) {
+    async execute({ agent, task, context, reason, notepadPath, directory, timeoutMs, background }, ctx) {
       const normalized = agent.toLowerCase().trim()
       const agentKey =
         Object.entries(AGENT_ALIASES).find(([k]) => k.toLowerCase() === normalized)?.[1] ?? agent
@@ -148,8 +219,6 @@ subagent will run in the wrong working directory.`,
       const reasonText = deriveReason(task, reason)
       const startedAt = Date.now()
 
-      // Capa A del guard: registrar el directorio de trabajo como raíz permitida
-      // para escrituras, de modo que el hook tool.execute.before no lo bloquee.
       allowRoot(workdir)
 
       let inheritedWisdom = ""
@@ -164,8 +233,6 @@ subagent will run in the wrong working directory.`,
         }
       }
 
-      // Si el subagente trabaja en una carpeta distinta del cwd de la sesión,
-      // inyectar un recordatorio explícito de identidad de repo (capa B refuerzo).
       const dirNotice =
         directory && directory !== ctx.directory
           ? `\n\n## Working Directory\nYou are operating in: ${workdir}\nThis is DIFFERENT from where opencode was launched. Run \`pwd\` and \`git remote -v\` first and confirm this is the intended project before any write or commit.`
@@ -175,33 +242,22 @@ subagent will run in the wrong working directory.`,
         ? `${task}\n\n## Context\n${context}${dirNotice}${inheritedWisdom}`
         : `${task}${dirNotice}${inheritedWisdom}`
 
-      ctx.metadata({ title: `→ ${agentKey}` })
+      ctx.metadata({ title: `→ ${agentKey}${background ? " [bg]" : ""}` })
 
-      // B) Aplanar read-only a la raíz para que sean visibles en vivo en la TUI.
-      // Los que escriben se mantienen anidados (conserva cancelación en cascada).
       const rootSession = getSessionRoot(ctx.sessionID) ?? ctx.sessionID
       const parentID = READ_ONLY_AGENTS.has(agentKey) ? rootSession : ctx.sessionID
 
-      // 1. Create child session
-      const created = await client.session.create({
-        body: { parentID },
-        query: { directory: workdir },
-      })
-      const sessionID = (created.data as any)?.id as string | undefined
-      if (!sessionID) return "ERROR: could not create subagent session"
+      const sessionID = await spawnSession(client, { agentKey, workdir, parentID, prompt })
 
-      // Registrar el agente y la raíz de la child session para que SUS delegaciones
-      // anidadas resuelvan correctamente su caller y su raíz.
       setSessionAgent(sessionID, agentKey)
       setSessionRoot(sessionID, rootSession)
 
-      // Toast: subagente corriendo + pista de teclado para inspeccionarlo
       const [shortName] = agentKey.split(" - ")
       try {
         await client.tui.showToast({
           body: {
-            title:    `🤖 ${shortName} corriendo`,
-            message:  `Ctrl+X ↓ para ver los subagentes`,
+            title:    `🤖 ${shortName}${background ? " [bg]" : ""} corriendo`,
+            message:  background ? "Usa background_result para recoger el resultado" : "Ctrl+X ↓ para ver los subagentes",
             variant:  "info",
             duration: 4000,
           },
@@ -210,50 +266,31 @@ subagent will run in the wrong working directory.`,
         // showToast no disponible (headless) — ignorar
       }
 
-      // 2. Send prompt to the subagent
-      await client.session.prompt({
-        path: { id: sessionID },
-        body: {
-          agent: agentKey,
-          parts: [{ type: "text", text: prompt }],
-        } as any,
-        query: { directory: workdir },
-      })
-
-      // 3. Poll until the session is idle (timeout configurable, default 5 min)
-      const maxAttempts = Math.max(1, Math.ceil((timeoutMs ?? 300_000) / 500))
-      let timedOut = false
-      for (let i = 0; i < maxAttempts; i++) {
-        await sleep(500)
-        const statusRes = await client.session.status({
-          query: { directory: workdir },
+      // Background mode: return immediately with task_id
+      if (background) {
+        logDelegation(ctx.directory, {
+          ts: new Date(startedAt).toISOString(),
+          caller,
+          callerSession: ctx.sessionID,
+          callee: agentKey,
+          childSession: sessionID,
+          reason: reasonText,
+          directory: workdir,
+          model: formatModel(cfg.agents[agentKey]?.model ?? agentKey),
+          background: true,
         })
-        const allStatuses = statusRes.data as Record<string, { type: string }> | undefined
-        const sessionStatus = allStatuses?.[sessionID]
-        if (!sessionStatus || sessionStatus.type === "idle") break
-        if (i === maxAttempts - 1) timedOut = true
+        return {
+          output: `Background task started. task_id: ${sessionID}`,
+          metadata: { task_id: sessionID, agent: agentKey, directory: workdir, background: true },
+        }
       }
 
-      // 4. Fetch messages and extract the last assistant text
-      const messagesRes = await client.session.messages({
-        path: { id: sessionID },
-        query: { directory: workdir },
-      })
-      const messages: any[] = (messagesRes.data as any) ?? []
+      // Sync mode: poll until done
+      const { text, timedOut } = await waitForResult(client, sessionID, workdir, timeoutMs ?? 300_000)
 
-      const lastAssistant = [...messages].reverse().find((m: any) => m.info?.role === "assistant")
-      const text = ((lastAssistant?.parts ?? []) as any[])
-        .filter((p: any) => p.type === "text")
-        .map((p: any) => p.text ?? "")
-        .join("\n")
-        .trim()
-
-      // Bug fix: resolve the real model ID from config instead of using agentKey
       const modelID = cfg.agents[agentKey]?.model ?? agentKey
       const durationMs = Date.now() - startedAt
 
-      // Registrar la arista del árbol de delegaciones (caller → callee).
-      // Se escribe en el proyecto raíz (ctx.directory) donde corren los comandos.
       const edge = {
         ts: new Date(startedAt).toISOString(),
         caller,
@@ -267,13 +304,56 @@ subagent will run in the wrong working directory.`,
         timedOut,
       }
       logDelegation(ctx.directory, edge)
-
-      // A) Persistir prompt + razonamiento completos para inspección posterior.
       writeTranscript(ctx.directory, sessionID, edge, prompt, text)
 
       return {
         output: timedOut ? `[TIMEOUT after ${Math.round((timeoutMs ?? 300_000) / 1000)}s]\n\n${text || "(no output)"}` : text || "(no output)",
         metadata: { agent: agentKey, model: formatModel(modelID), sessionID, timedOut, directory: workdir, caller, reason: reasonText, durationMs },
+      }
+    },
+  })
+}
+
+export function makeBackgroundResult(client: PluginInput["client"]) {
+  return tool({
+    description: `Retrieve the result of a background task started with delegate_task(background=true).
+Blocks until the session is idle, then returns the full result.
+Use this after launching multiple background agents to collect their outputs.`,
+
+    args: {
+      task_id: tool.schema
+        .string()
+        .describe("The task_id returned by delegate_task(background=true)"),
+      directory: tool.schema
+        .string()
+        .optional()
+        .describe("Working directory of the background session. Defaults to current directory."),
+      timeoutMs: tool.schema
+        .number()
+        .optional()
+        .describe("Max wait time in ms. Defaults to 300000 (5 min)."),
+    },
+
+    async execute({ task_id, directory, timeoutMs }, ctx) {
+      const workdir = directory ?? ctx.directory
+      const { text, timedOut } = await waitForResult(client, task_id, workdir, timeoutMs ?? 300_000)
+
+      try {
+        await client.tui.showToast({
+          body: {
+            title:    "✅ Background task complete",
+            message:  task_id.slice(0, 16),
+            variant:  "success",
+            duration: 3000,
+          },
+        })
+      } catch {}
+
+      return {
+        output: timedOut
+          ? `[TIMEOUT after ${Math.round((timeoutMs ?? 300_000) / 1000)}s]\n\n${text || "(no output)"}`
+          : text || "(no output)",
+        metadata: { task_id, timedOut },
       }
     },
   })
