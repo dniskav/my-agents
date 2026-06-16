@@ -97,20 +97,45 @@ export const server: Plugin = async (input) => {
       background_result: makeBackgroundResult(input.client),
     },
 
-    // Trunca outputs de herramientas que tienden a ser grandes para evitar context bloat.
-    // Inspirado en oh-my-opencode/tool-output-truncator.
     "tool.execute.after": async (hookInput: any, hookOutput: any) => {
-      const TRUNCATABLE = new Set(["grep", "glob", "bash", "webfetch", "lsp_diagnostics", "read"])
       const tool = hookInput?.tool ?? ""
-      if (!TRUNCATABLE.has(tool)) return
+      const output: unknown = hookOutput?.output
 
-      const MAX = tool === "webfetch" ? 40_000 : 150_000
-      const output = hookOutput?.output
-      if (typeof output !== "string" || output.length <= MAX) return
+      // 1. Tool Output Truncator — evita context bloat en herramientas verbosas.
+      const TRUNCATABLE = new Set(["grep", "glob", "bash", "webfetch", "lsp_diagnostics", "read"])
+      if (TRUNCATABLE.has(tool) && typeof output === "string") {
+        const MAX = tool === "webfetch" ? 40_000 : 150_000
+        if (output.length > MAX) {
+          hookOutput.output =
+            output.slice(0, MAX) +
+            `\n\n[... truncated — ${output.length - MAX} chars omitted to prevent context bloat ...]`
+        }
+      }
 
-      hookOutput.output =
-        output.slice(0, MAX) +
-        `\n\n[... truncated — ${output.length - MAX} chars omitted to prevent context bloat ...]`
+      // 2. Edit Error Recovery — cuando edit falla, fuerza releer el archivo antes de reintentar.
+      if (tool === "edit" && typeof output === "string") {
+        const EDIT_ERRORS = [
+          "oldString and newString must be different",
+          "oldString not found",
+          "oldString found multiple times",
+        ]
+        const matched = EDIT_ERRORS.find((e) => output.includes(e))
+        if (matched) {
+          hookOutput.output =
+            output +
+            `\n\n⚠️ EDIT FAILED (${matched}).\n` +
+            `You MUST re-read the file with the Read tool to get its current exact content before retrying. ` +
+            `Do not guess or reconstruct the content from memory — read it, then edit with the exact string you see.`
+        }
+      }
+
+      // 3. Empty Response Detector — avisa cuando delegate_task devuelve vacío.
+      if (tool === "delegate_task" && (output === "" || output === "(no output)" || output === null || output === undefined)) {
+        hookOutput.output =
+          `⚠️ DELEGATE TASK returned no output. The subagent either failed silently, ` +
+          `ran out of context, or was interrupted. Do not assume the task completed. ` +
+          `Re-delegate with more specific instructions or a shorter scope.`
+      }
     },
 
     // Capa C — Gaara Guard: bloquea write/edit fuera de las raíces de trabajo
@@ -137,6 +162,22 @@ export const server: Plugin = async (input) => {
           `'directory' apuntando a la ruta absoluta de ese proyecto.`
         )
       }
+    },
+
+    // 4. Compaction Context Injector — cuando el contexto se compacta, estructura
+    // el resumen para preservar requests originales, trabajo hecho, pendientes y restricciones.
+    "experimental.session.compacting": async (_input: any, output: any) => {
+      output.context = output.context ?? []
+      output.context.push(
+        `When summarizing this session, your compacted summary MUST include these five sections:
+1. ORIGINAL REQUESTS — list every user request verbatim, exactly as stated
+2. FINAL GOAL — the overarching objective in one sentence
+3. COMPLETED WORK — what was fully implemented, verified, or resolved (with file paths)
+4. PENDING TASKS — what is incomplete, blocked, or not yet started
+5. CONSTRAINTS & PROHIBITED APPROACHES — decisions made, patterns to follow, things explicitly ruled out
+
+Do not omit section 5. Losing constraints causes agents to repeat rejected approaches.`
+      )
     },
 
     "chat.message": async (msg) => {
