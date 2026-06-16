@@ -4,6 +4,7 @@
     "@tarquinen/opencode-dcp@latest",
     "./plugin/my-agents/index.ts"
   ],
+  "lsp": true,
   "mcp": {
     "playwright": {
       "type": "local",

@@ -96,6 +96,22 @@ export const server: Plugin = async (input) => {
       delegate_task: makeDelegateTask(input.client, cfg),
     },
 
+    // Trunca outputs de herramientas que tienden a ser grandes para evitar context bloat.
+    // Inspirado en oh-my-opencode/tool-output-truncator.
+    "tool.execute.after": async (hookInput: any, hookOutput: any) => {
+      const TRUNCATABLE = new Set(["grep", "glob", "bash", "webfetch", "lsp_diagnostics", "read"])
+      const tool = hookInput?.tool ?? ""
+      if (!TRUNCATABLE.has(tool)) return
+
+      const MAX = tool === "webfetch" ? 40_000 : 150_000
+      const output = hookOutput?.output
+      if (typeof output !== "string" || output.length <= MAX) return
+
+      hookOutput.output =
+        output.slice(0, MAX) +
+        `\n\n[... truncated — ${output.length - MAX} chars omitted to prevent context bloat ...]`
+    },
+
     // Capa C — Gaara Guard: bloquea write/edit fuera de las raíces de trabajo
     // permitidas (cwd inicial + cualquier `directory` delegado explícitamente).
     // Fail-open: si no hay raíces registradas, no interfiere.
