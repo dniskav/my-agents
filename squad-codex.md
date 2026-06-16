@@ -10,6 +10,7 @@
 
 | Agent | Mode | Primary Use | Recommended Model |
 |---|---|---|---|
+| **Aizen** | Primary | Entry point — analyzes any input and routes to the right agent | `qwen3.7-plus` |
 | **Rimuru** | Primary | Orchestrate complex multi-step tasks | `kimi-k2.6` |
 | **Norman** | Primary | Design implementation plans before executing | `minimax-m2.7` |
 | **Kakashi** | Primary | Resolve a complete task end-to-end autonomously | `deepseek-v4-pro` |
@@ -27,6 +28,10 @@
 ### Usage Examples
 
 #### Primary — invoked directly by the user
+
+**Aizen** ← user only (cannot be delegated to by other agents)
+> *"[any input — text, screenshots, mixed]"*
+> → Analyzes the input (including images), picks the right agent from a routing table, delegates immediately with full context, returns the result. No questions asked.
 
 **Rimuru**
 > *"Add JWT authentication to the API, including login, refresh token and route protection middleware"*
@@ -85,6 +90,7 @@
 
 | Agente | Modo | Uso principal | Modelo recomendado |
 |---|---|---|---|
+| **Aizen** | Principal | Punto de entrada — analiza cualquier input y enruta al agente correcto | `qwen3.7-plus` |
 | **Rimuru** | Principal | Orquestar tareas complejas multi-paso | `kimi-k2.6` |
 | **Norman** | Principal | Diseñar planes de implementación antes de ejecutar | `minimax-m2.7` |
 | **Kakashi** | Principal | Resolver una tarea completa end-to-end solo | `deepseek-v4-pro` |
@@ -102,6 +108,10 @@
 ### Ejemplos de uso
 
 #### Principales — el usuario los invoca directamente
+
+**Aizen** ← solo el usuario (ningún agente puede delegarle)
+> *"[cualquier input — texto, screenshots, mixed]"*
+> → Analiza el input (incluyendo imágenes), elige el agente correcto de una tabla de routing, delega de inmediato con el contexto completo, devuelve el resultado. Sin preguntas.
 
 **Rimuru**
 > *"Agrega autenticación JWT a la API, incluyendo login, refresh token y middleware de protección de rutas"*

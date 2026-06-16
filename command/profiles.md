@@ -25,6 +25,7 @@ MODE=$(cat ~/.config/opencode/.agent-mode 2>/dev/null || echo "eco")
 echo "● Agent mode: $MODE"
 echo ""
 if [ "$MODE" = "optimal" ]; then
+  echo "  Aizen     → opencode-go/qwen3.7-plus      [go — vision]"
   echo "  Rimuru    → opencode-go/kimi-k2.6        [paid $$]"
   echo "  Urahara   → opencode-go/deepseek-v4-pro   [paid $$]"
   echo "  Senku     → opencode-go/deepseek-v4-pro   [paid $$]"
@@ -35,6 +36,7 @@ if [ "$MODE" = "optimal" ]; then
   echo "  Gaara     → opencode-go/deepseek-v4-flash [go — fast]"
   echo "  Gojo      → opencode-go/mimo-v2.5         [go — vision]"
 elif [ "$MODE" = "smart" ]; then
+  echo "  Aizen     → opencode-go/qwen3.7-plus      [go — vision]"
   echo "  Rimuru    → opencode-go/kimi-k2.6         [paid $]"
   echo "  Urahara   → opencode-go/kimi-k2.6         [paid $]"
   echo "  Senku     → opencode-go/mimo-v2.5-pro     [paid $]"
@@ -45,6 +47,7 @@ elif [ "$MODE" = "smart" ]; then
   echo "  Gaara     → opencode-go/deepseek-v4-flash [go — fast]"
   echo "  Gojo      → opencode-go/mimo-v2.5         [go — vision]"
 else
+  echo "  Aizen     → opencode-go/qwen3.7-plus      [go — vision]"
   echo "  Rimuru    → opencode-go/qwen3.6-plus      [go]"
   echo "  Urahara   → opencode-go/qwen3.6-plus      [go]"
   echo "  Senku     → opencode-go/deepseek-v4-flash [go — fast]"

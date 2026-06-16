@@ -15,6 +15,11 @@ const READ_ONLY_AGENTS = new Set([
   "Neji - (Verifier)",
 ])
 
+// Agents that exist in the system but cannot be delegated to programmatically.
+// Aizen is the user-facing entry point — calling it from inside the harness
+// would create a routing loop with no value.
+const DISPATCH_ONLY_AGENTS = new Set(["aizen"])
+
 const AGENT_ALIASES: Record<string, string> = {
   Rimuru:    "Rimuru - (Orchestrator)",
   Norman:    "Norman - (Planner)",
@@ -212,6 +217,14 @@ subagent will run in the wrong working directory.`,
 
     async execute({ agent, task, context, reason, notepadPath, directory, timeoutMs, background }, ctx) {
       const normalized = agent.toLowerCase().trim()
+
+      if (DISPATCH_ONLY_AGENTS.has(normalized)) {
+        return {
+          output: `⛔ Cannot delegate to Aizen — it is the user-facing entry point, not a subagent. ` +
+                  `Aizen routes tasks to the squad; the squad does not route back to Aizen.`,
+        }
+      }
+
       const agentKey =
         Object.entries(AGENT_ALIASES).find(([k]) => k.toLowerCase() === normalized)?.[1] ?? agent
       const workdir = directory ?? ctx.directory
@@ -245,7 +258,9 @@ subagent will run in the wrong working directory.`,
       ctx.metadata({ title: `→ ${agentKey}${background ? " [bg]" : ""}` })
 
       const rootSession = getSessionRoot(ctx.sessionID) ?? ctx.sessionID
-      const parentID = READ_ONLY_AGENTS.has(agentKey) ? rootSession : ctx.sessionID
+      // Background tasks always attach to rootSession so they appear in the TUI sidebar.
+      // Sync writer agents stay nested under the caller for in-context visibility.
+      const parentID = (background || READ_ONLY_AGENTS.has(agentKey)) ? rootSession : ctx.sessionID
 
       const sessionID = await spawnSession(client, { agentKey, workdir, parentID, prompt })
 
@@ -257,7 +272,7 @@ subagent will run in the wrong working directory.`,
         await client.tui.showToast({
           body: {
             title:    `🤖 ${shortName}${background ? " [bg]" : ""} corriendo`,
-            message:  background ? "Usa background_result para recoger el resultado" : "Ctrl+X ↓ para ver los subagentes",
+            message:  background ? "Visible en el sidebar — usa background_result para recoger el resultado" : "Ctrl+X ↓ para ver los subagentes",
             variant:  "info",
             duration: 4000,
           },
