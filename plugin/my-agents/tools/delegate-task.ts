@@ -16,6 +16,7 @@ const READ_ONLY_AGENTS = new Set([
 ])
 
 const AGENT_ALIASES: Record<string, string> = {
+  Aizen:     "Aizen - (Dispatcher)",
   Rimuru:    "Rimuru - (Orchestrator)",
   Norman:    "Norman - (Planner)",
   Urahara:   "Urahara - (Oracle)",
@@ -180,7 +181,7 @@ subagent will run in the wrong working directory.`,
     args: {
       agent: tool.schema
         .string()
-        .describe("Short agent name: Rimuru | Norman | Urahara | Jiraiya | Kakashi | Senku | Rock-Lee | Neji | Gilgamesh | Gojo | Gaara"),
+        .describe("Short agent name: Aizen | Rimuru | Norman | Urahara | Jiraiya | Kakashi | Senku | Rock-Lee | Neji | Gilgamesh | Gojo | Gaara"),
       task: tool.schema
         .string()
         .describe("Full task description — be explicit, include all needed context inline. Use the 6-section format when delegating complex work: TASK / EXPECTED OUTCOME / TOOLS TO USE / MUST DO / MUST NOT DO / CONTEXT"),
