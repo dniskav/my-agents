@@ -1,8 +1,8 @@
 ---
-description: Switch agent profiles between eco, smart, and optimal. Usage: /agents [eco|smart|optimal|status]
+description: Switch agent cost profiles (free, eco, smart, optimal). Usage: /profiles [free|eco|smart|optimal|status]
 ---
 
-# /agents
+# /profiles
 
 Switch between agent cost profiles.
 
@@ -61,7 +61,7 @@ echo "  eco     ~\$0.5-1   — Go limits apply, $30/week budget"
 echo "  smart   ~\$3-6    — kimi+mimo-pro activos, Go para el resto"
 echo "  optimal ~\$10-15  — kimi+v4-pro en Rimuru/urahara/senku"
 echo ""
-echo "  To switch: /agents eco  |  /agents smart  |  /agents optimal"
+echo "  To switch: /profiles eco  |  /profiles smart  |  /profiles optimal  |  /profiles free"
 ```
 
 ---

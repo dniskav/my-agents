@@ -30,6 +30,6 @@ for name, cfg in agents.items():
 extract
 
 echo ""
-echo "  To switch profile: /agents [free|eco|smart|optimal]"
+echo "  To switch profile: /profiles [free|eco|smart|optimal]"
 echo "  No tokens? Run: ~/.config/opencode/switch.sh <profile>"
 ```
