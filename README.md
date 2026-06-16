@@ -21,7 +21,7 @@ It's inspired by `oh-my-openagent`, rebuilt from scratch with a focus on **safet
 
 ## ✨ Features
 
-- **🥷 11-agent squad** orchestrated via a custom `delegate_task` tool — agents call each other with a strict 6-section task format. Each agent has a focused role with no overlap.
+- **🥷 13-agent squad** orchestrated via a custom `delegate_task` tool — agents call each other with a strict 6-section task format. Each agent has a focused role with no overlap.
 - **🛡️ Repo-Identity Guard ("Gaara")** — three layers that stop an agent from editing the *wrong* repository (the classic "I ran opencode in project A but asked it to fix project B" footgun).
 - **🔁 Autonomous loops & missions** — `/loop` iterates `execute → verify` against a checkable done-criterion without per-step gates; `/mission` runs a full gated workflow with crash-safe state.
 - **🌳 Delegation tree** — every delegation is logged (who called whom, why, model, duration) and each subagent's full prompt + reasoning is saved for inspection via `/delegations`.
@@ -32,6 +32,7 @@ It's inspired by `oh-my-openagent`, rebuilt from scratch with a focus on **safet
 
 | Agent | Mode | Role |
 |---|---|---|
+| **Aizen** | primary | Dispatcher — analyzes any input (text/images/mixed) and routes to the right agent via handoff |
 | **Rimuru** | primary | Orchestrator — classifies intent, plans, delegates, verifies |
 | **Norman** | primary | Planner — interviews, produces rigorous plans (validated by Gilgamesh) |
 | **Kakashi** | primary | Deep Worker — autonomous end-to-end: explore → implement → QA solo |
@@ -40,6 +41,7 @@ It's inspired by `oh-my-openagent`, rebuilt from scratch with a focus on **safet
 | **Senku** | subagent | Coder — precise, surgical implementation |
 | **Rock-Lee** | subagent | Executor — persistent multi-file implementation until done |
 | **Neji** | subagent | Verifier — runs tsc / lint / tests / build and reports results (read-only) |
+| **Hange** | subagent | QA Tester — E2E browser testing with playwright + chrome-devtools, categorized bug reports, never fixes (read-only) |
 | **Gilgamesh** | subagent | Plan Reviewer — ruthless critic: APPROVED / REVISIONS / REJECTED |
 | **Gojo** | subagent | Vision — screenshots, images, PDFs, diagrams |
 | **Gaara** | subagent | Guardian — repo-identity & boundary checks before writes/commits (read-only) |
@@ -107,10 +109,12 @@ Requires [opencode](https://opencode.ai) and a TypeScript-capable runtime (bun r
 ├── my-agents.schema.json     # config schema
 ├── plugin/my-agents/
 │   ├── agents.ts             # all agent system prompts
-│   ├── index.ts              # plugin entry: agents, guard hook, toasts
+│   ├── index.ts              # plugin entry: agents, guard hook, toasts, handoff dispatcher
 │   ├── guard.ts              # write-boundary allowlist (Gaara Guard)
-│   ├── registry.ts           # sessionID → agent / root maps
-│   └── tools/delegate-task.ts# delegation tool + logging + transcripts
+│   ├── registry.ts           # sessionID → agent / root / override maps
+│   └── tools/
+│       ├── delegate-task.ts  # delegation tool + logging + transcripts
+│       └── handoff.ts        # session transfer tool (Aizen → specialist)
 ├── command/                  # slash commands (/mission, /loop, /profile, …)
 └── context/                  # shared context injected into sessions
 ```

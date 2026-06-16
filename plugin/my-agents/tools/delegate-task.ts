@@ -13,6 +13,7 @@ const READ_ONLY_AGENTS = new Set([
   "Jiraiya - (Explorer)",
   "Gaara - (Guardian)",
   "Neji - (Verifier)",
+  "Hange - (QA Tester)",
 ])
 
 // Agents that exist in the system but cannot be delegated to programmatically.
@@ -29,6 +30,7 @@ const AGENT_ALIASES: Record<string, string> = {
   Senku:     "Senku - (Coder)",
   "Rock-Lee": "Rock-Lee - (Executor)",
   Neji:      "Neji - (Verifier)",
+  Hange:     "Hange - (QA Tester)",
   Gilgamesh: "Gilgamesh - (Plan Reviewer)",
   Gojo:      "Gojo - (Vision)",
   Gaara:     "Gaara - (Guardian)",
@@ -169,6 +171,7 @@ Agents and when to use them:
 - Senku: implement code — write, edit, refactor (precise, surgical)
 - Rock-Lee: implement with persistence — multi-file changes, iterative fixes, keep going until done
 - Neji: run quality checks — tsc, lint, tests, build — and report results (read-only)
+- Hange: E2E browser QA — starts server, tests flows with playwright + chrome-devtools, reports bugs categorized by severity (read-only, never fixes)
 - Gilgamesh: review a plan or implementation for gaps and risks
 - Gojo: analyze screenshots, images, diagrams
 - Gaara: repo-identity & boundary guardian — verify you're in the right repo before writes/commits

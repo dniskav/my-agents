@@ -20,6 +20,7 @@ The plugin lives at `plugin/my-agents/`. Configuration variants (eco/smart/optim
 | **Senku** | Subagent | Coder — precise surgical implementation, 1-2 files |
 | **Rock-Lee** | Subagent | Executor — persistent multi-file implementation until fully done |
 | **Neji** | Subagent | Verifier — runs tsc, lint, tests and build; reports results only (read-only) |
+| **Hange** | Subagent | QA Tester — E2E browser testing with playwright + chrome-devtools, categorized bug reports, never fixes (read-only) |
 | **Gilgamesh** | Subagent | Plan Reviewer — ruthless critic, APPROVED / REVISIONS NEEDED / REJECTED |
 | **Gojo** | Subagent | Vision — screenshots, images, PDFs, diagrams |
 | **Gaara** | Subagent | Guardian — repo-identity & boundary checks before writes/commits (read-only) |
@@ -62,11 +63,14 @@ MUST NOT DO: [forbidden actions]
 CONTEXT: [file paths, patterns, prior findings]
 ```
 
-### Plan → Review → Execute loop
+### Plan → Review → Execute → QA loop
 1. **Norman** produces the plan (interviews first for complex tasks)
 2. **Gilgamesh** reviews it — APPROVED before Rimuru executes
 3. **Rimuru** delegates implementation to Senku / Rock-Lee
 4. **Rimuru** reads every changed file after delegation — doesn't trust self-reports
+5. **Hange** tests all flows with playwright + chrome-devtools, returns categorized bug report
+   - QA-only request → present report, stop (user decides what to fix)
+   - Implementation request → fix blockers, call Hange again, repeat until clean
 
 ## Key files
 
@@ -106,3 +110,5 @@ The active config is loaded from `my-agents.json`. To switch variants, copy the 
 - `Gilgamesh` acts as both pre-plan gap checker (metis role) and post-plan validator (momus role)
 - `Kakashi` is the go-to for self-contained tasks that don't need orchestration
 - `Rock-Lee` and `Senku` are both coders — Senku for precision, Rock-Lee for persistence
+- `Hange` never fixes — reports only. The fix loop lives in Rimuru, not Hange
+- `Neji` (static checks: tsc/lint/tests) ≠ `Hange` (live browser QA with playwright + devtools)

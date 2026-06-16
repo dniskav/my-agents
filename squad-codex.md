@@ -10,17 +10,18 @@
 
 | Agent | Mode | Primary Use | Recommended Model |
 |---|---|---|---|
-| **Aizen** | Primary | Entry point — analyzes any input and routes to the right agent | `qwen3.7-plus` |
-| **Rimuru** | Primary | Orchestrate complex multi-step tasks | `kimi-k2.6` |
+| **Aizen** | Primary | Entry point — analyzes any input (text/images/mixed) and routes via handoff | `qwen3.7-plus` |
+| **Rimuru** | Primary | Orchestrate complex multi-step tasks | `minimax-m2.7` |
 | **Norman** | Primary | Design implementation plans before executing | `minimax-m2.7` |
-| **Kakashi** | Primary | Resolve a complete task end-to-end autonomously | `deepseek-v4-pro` |
+| **Kakashi** | Primary | Resolve a complete task end-to-end autonomously | `kimi-k2.6` |
 | **Urahara** | Subagent | Deep analysis, architecture decisions, tradeoffs | `kimi-k2.6` |
 | **Jiraiya** | Subagent | Navigate codebase, find files, patterns, symbols | `deepseek-v4-flash` |
-| **Senku** | Subagent | Precise and surgical implementation | `mimo-v2.5-pro` |
-| **Rock-Lee** | Subagent | Persistent multi-file implementation until fully done | `mimo-v2.5-pro` |
+| **Senku** | Subagent | Precise and surgical implementation | `kimi-k2.7-code` |
+| **Rock-Lee** | Subagent | Persistent multi-file implementation until fully done | `kimi-k2.7-code` |
 | **Neji** | Subagent | Run tsc, lint, tests, build — report results only (read-only) | `deepseek-v4-flash` |
+| **Hange** | Subagent | E2E browser QA with playwright + chrome-devtools, categorized bug reports, never fixes (read-only) | `kimi-k2.6` |
 | **Gilgamesh** | Subagent | Review plans and implementations, find gaps and risks | `minimax-m2.7` |
-| **Gojo** | Subagent | Analyze screenshots, images, PDFs and diagrams | `mimo-v2.5` |
+| **Gojo** | Subagent | Analyze screenshots, images, PDFs and diagrams | `qwen3.7-plus` |
 | **Gaara** | Subagent | Verify repo identity and boundaries before any write/commit (read-only) | `deepseek-v4-flash` |
 
 ---
@@ -77,6 +78,23 @@
 > *"The user attached a mockup of the new dashboard — describe its structure and the components we need"*
 > → Rimuru or Kakashi call it when there's an image or PDF to interpret before planning or implementing.
 
+**Neji** ← Rimuru / Kakashi
+> *"Run tsc and the test suite on the current state of the repo"*
+> → Rimuru calls Neji after every implementation round to verify the build is clean before closing the task. Neji reports only — never edits.
+
+**Hange** ← Rimuru / Kakashi
+> *"The admin panel is built — test all flows: login, dashboard, settings, 404 behavior"*
+> → Rimuru calls Hange after implementation passes Neji checks. Hange starts the dev server, drives every flow with playwright, observes network and console with chrome-devtools, and returns a structured report (🔴 BLOCKERS / 🟡 MEDIUM / 🟢 LOW / ✅ Passing). Read-only — never fixes, never suggests code changes.
+> For QA-only requests: Rimuru presents the report and stops. For implementation tasks: Rimuru fixes blockers and calls Hange again until all flows pass.
+
+**Gilgamesh** ← Norman / Rimuru
+> *"Review this database migration plan before we execute it"*
+> → Norman calls it before delivering any complex plan. Rimuru calls it after receiving the plan from Norman and before executing.
+
+**Gojo** ← Rimuru / Kakashi
+> *"The user attached a mockup of the new dashboard — describe its structure and the components we need"*
+> → Rimuru or Kakashi call it when there's an image or PDF to interpret before planning or implementing.
+
 **Gaara** ← Rimuru / Kakashi
 > *"We're about to write to this directory — confirm it's the neuron library and not the neuron app"*
 > → Called before any write or commit when the session spans multiple projects or the target repo is ambiguous. Read-only — verdicts only, never edits.
@@ -90,17 +108,18 @@
 
 | Agente | Modo | Uso principal | Modelo recomendado |
 |---|---|---|---|
-| **Aizen** | Principal | Punto de entrada — analiza cualquier input y enruta al agente correcto | `qwen3.7-plus` |
-| **Rimuru** | Principal | Orquestar tareas complejas multi-paso | `kimi-k2.6` |
+| **Aizen** | Principal | Punto de entrada — analiza cualquier input (texto/imágenes/mixto) y enruta via handoff | `qwen3.7-plus` |
+| **Rimuru** | Principal | Orquestar tareas complejas multi-paso | `minimax-m2.7` |
 | **Norman** | Principal | Diseñar planes de implementación antes de ejecutar | `minimax-m2.7` |
-| **Kakashi** | Principal | Resolver una tarea completa end-to-end solo | `deepseek-v4-pro` |
+| **Kakashi** | Principal | Resolver una tarea completa end-to-end solo | `kimi-k2.6` |
 | **Urahara** | Subagente | Análisis profundo, decisiones de arquitectura, tradeoffs | `kimi-k2.6` |
 | **Jiraiya** | Subagente | Navegar el codebase, encontrar archivos, patrones, símbolos | `deepseek-v4-flash` |
-| **Senku** | Subagente | Implementación precisa y quirúrgica | `mimo-v2.5-pro` |
-| **Rock-Lee** | Subagente | Implementación persistente multi-archivo hasta completar | `mimo-v2.5-pro` |
+| **Senku** | Subagente | Implementación precisa y quirúrgica | `kimi-k2.7-code` |
+| **Rock-Lee** | Subagente | Implementación persistente multi-archivo hasta completar | `kimi-k2.7-code` |
 | **Neji** | Subagente | Ejecutar tsc, lint, tests, build — solo reporta resultados (solo lectura) | `deepseek-v4-flash` |
+| **Hange** | Subagente | QA E2E con playwright + chrome-devtools, reporte categorizado de bugs, nunca arregla (solo lectura) | `kimi-k2.6` |
 | **Gilgamesh** | Subagente | Revisar planes e implementaciones, encontrar gaps y riesgos | `minimax-m2.7` |
-| **Gojo** | Subagente | Analizar screenshots, imágenes, PDFs y diagramas | `mimo-v2.5` |
+| **Gojo** | Subagente | Analizar screenshots, imágenes, PDFs y diagramas | `qwen3.7-plus` |
 | **Gaara** | Subagente | Verificar identidad del repo y límites antes de cualquier escritura/commit (solo lectura) | `deepseek-v4-flash` |
 
 ---
@@ -148,6 +167,15 @@
 **Neji** ← Rimuru / Kakashi
 > *"Ejecuta tsc y la suite de tests sobre el estado actual del repo"*
 > → Rimuru llama a Neji después de cada ronda de implementación para verificar que el build está limpio antes de cerrar la tarea. Solo reporta — nunca edita.
+
+**Gilgamesh** ← Norman / Rimuru
+> *"Revisa este plan de migración de base de datos antes de que lo ejecutemos"*
+> → Norman lo llama antes de entregar cualquier plan complejo. Rimuru lo llama después de recibir el plan de Norman y antes de ejecutar.
+
+**Hange** ← Rimuru / Kakashi
+> *"El admin panel está listo — probá todos los flujos: login, dashboard, configuración, 404"*
+> → Rimuru llama a Hange después de que la implementación pasa los checks de Neji. Hange levanta el servidor, recorre cada flujo con playwright, observa red y consola con chrome-devtools, y entrega un reporte estructurado (🔴 BLOCKERS / 🟡 MEDIUM / 🟢 LOW / ✅ Passing). Solo lectura — nunca arregla, nunca sugiere código.
+> Para requests de solo QA: Rimuru presenta el reporte y para. Para tareas de implementación: Rimuru arregla los blockers y vuelve a llamar a Hange hasta que todos los flujos pasen.
 
 **Gilgamesh** ← Norman / Rimuru
 > *"Revisa este plan de migración de base de datos antes de que lo ejecutemos"*

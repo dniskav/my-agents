@@ -1,4 +1,5 @@
 {
+  "version": "1.3.0",
   "dependencies": {
     "@oh-my-pi/hashline": "^16.0.1",
     "@opencode-ai/plugin": "1.16.2"

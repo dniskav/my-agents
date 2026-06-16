@@ -7,7 +7,7 @@ import { makeDelegateTask, makeBackgroundResult } from "./tools/delegate-task.ts
 import { makeHandoff } from "./tools/handoff.ts"
 import { hashlineRead, hashlineEdit } from "./tools/hashline.ts"
 import { allowRoot, isAllowedPath, getRoots } from "./guard.ts"
-import { setSessionAgent } from "./registry.ts"
+import { setSessionAgent, setSessionRoot, getSessionRoot, getPendingHandoff, clearPendingHandoff, setAgentOverride, getAgentOverride } from "./registry.ts"
 
 interface AgentEntry {
   model: string
@@ -63,6 +63,8 @@ function buildBrowserRules(browser: BrowserEngineConfig): string {
 export const server: Plugin = async (input) => {
   const cfg = loadConfig()
   const lastAgent = new Map<string, string>()
+  // Sessions where the next text generation should be blanked (post-handoff silence)
+  const silenceAfterHandoff = new Set<string>()
 
   // Capa C del guard: registrar el cwd inicial como raíz permitida para escrituras.
   allowRoot((input as any).directory ?? (input as any).worktree ?? process.cwd())
@@ -143,6 +145,17 @@ export const server: Plugin = async (input) => {
           `ran out of context, or was interrupted. Do not assume the task completed. ` +
           `Re-delegate with more specific instructions or a shorter scope.`
       }
+
+      // 4. Handoff silence: blank any text Aizen generates after a SUCCESSFUL handoff.
+      //    Only silence when output is empty (successful dispatch) — the dedup guard
+      //    returns a non-empty error that should remain visible if it fires.
+      if (tool === "handoff") {
+        const sid: string | undefined = hookInput?.sessionID
+        const out: unknown = hookOutput?.output
+        if (sid && (out === "" || out === undefined || out === null)) {
+          silenceAfterHandoff.add(sid)
+        }
+      }
     },
 
     // Capa C — Gaara Guard: bloquea write/edit fuera de las raíces de trabajo
@@ -185,6 +198,115 @@ export const server: Plugin = async (input) => {
 
 Do not omit section 5. Losing constraints causes agents to repeat rejected approaches.`
       )
+    },
+
+    // Enforces Aizen's silence after handoff. Keep silencing until session.idle
+    // fires — thinking models emit multiple text.complete calls per turn, so we
+    // must NOT delete from silenceAfterHandoff on the first completion.
+    "experimental.text.complete": async (textInput: any, textOutput: any) => {
+      const sid: string | undefined = textInput?.sessionID
+      if (!sid || !silenceAfterHandoff.has(sid)) return
+      textOutput.text = ""
+    },
+
+    // Handoff dispatcher: after Aizen's turn ends (session.idle), activates the
+    // target agent IN THE SAME SESSION by re-prompting (now idle = no QUEUED deadlock).
+    // The agent's prompt is injected via messages.transform (invisible to the user).
+    event: async ({ event }) => {
+      if (event.type !== "session.idle") return
+      const { sessionID } = event.properties
+
+      // Clear silence flag once the turn is fully complete
+      silenceAfterHandoff.delete(sessionID)
+
+      const handoff = getPendingHandoff(sessionID)
+      if (!handoff) return
+      clearPendingHandoff(sessionID)
+
+      setAgentOverride(sessionID, handoff.agentKey)
+      setSessionAgent(sessionID, handoff.agentKey)
+
+      const [shortName] = handoff.agentKey.split(" - ")
+
+      try {
+        // Re-inject just the original task — messages.transform injects the agent
+        // prompt invisibly (LLM sees it, user does not).
+        await (input.client.session.prompt as any)({
+          path:  { id: sessionID },
+          body:  { parts: [{ type: "text", text: handoff.task }] },
+          query: { directory: handoff.directory },
+        })
+      } catch (err) {
+        try {
+          await input.client.tui.showToast({
+            body: {
+              title:   `⚠️ Handoff falló → ${shortName}`,
+              message: String(err),
+              variant: "error",
+              duration: 6000,
+            },
+          })
+        } catch {}
+      }
+    },
+
+    // Injects the target agent's full prompt into the FIRST user message before
+    // each LLM call — invisible to the user (stored messages are not affected),
+    // but the LLM receives the correct role context for every turn.
+    "experimental.chat.messages.transform": async (_: any, msgOutput: any) => {
+      const messages: Array<{ info: any; parts: any[] }> = msgOutput?.messages ?? []
+      // Derive sessionID from any message in the history
+      const sid: string | undefined = messages.find((m) => m.info?.sessionID)?.info?.sessionID
+      if (!sid) return
+      const overrideAgent = getAgentOverride(sid)
+      if (!overrideAgent) return
+      const targetPrompt = PROMPTS[overrideAgent]
+      if (!targetPrompt) return
+      const [shortName] = overrideAgent.split(" - ")
+
+      // Prepend the agent override to the FIRST user message only.
+      // The full history is sent each call, so we inject once at the beginning
+      // to give the LLM its role context before seeing any conversation.
+      const firstUser = messages.find((m) => m.info?.role === "user")
+      if (!firstUser) return
+      const existingText = (firstUser.parts as any[])
+        .filter((p) => p.type === "text")
+        .map((p) => p.text ?? "")
+        .join("\n")
+      firstUser.parts = [
+        {
+          type: "text",
+          text: [
+            `<agent_override>`,
+            `You are now ${shortName}. Disregard your previous role. Your instructions:`,
+            ``,
+            targetPrompt + globalSuffix,
+            `</agent_override>`,
+            ``,
+            existingText,
+          ].join("\n"),
+        },
+      ]
+    },
+
+    // Limits Aizen's token output after a handoff so the response is effectively
+    // empty. Works in tandem with text.complete (which blanks whatever is generated).
+    "chat.params": async (paramInput: any, paramOutput: any) => {
+      const sid: string | undefined = paramInput?.sessionID
+      if (!sid || !silenceAfterHandoff.has(sid)) return
+      paramOutput.maxOutputTokens = 10
+    },
+
+    // Keeps system.transform as a secondary mechanism — replaces Aizen's system
+    // prompt with the target agent's if the hook receives the sessionID.
+    "experimental.chat.system.transform": async (transformInput: any, transformOutput: any) => {
+      const sid: string | undefined = transformInput?.sessionID
+      if (!sid) return
+      const overrideAgent = getAgentOverride(sid)
+      if (!overrideAgent) return
+      const targetPrompt = PROMPTS[overrideAgent]
+      if (!targetPrompt) return
+      transformOutput.system = [targetPrompt + globalSuffix]
     },
 
     "chat.message": async (msg) => {

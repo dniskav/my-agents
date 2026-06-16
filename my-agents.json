@@ -13,7 +13,10 @@
       ],
       "mode": "primary",
       "color": "#94A3B8",
-      "description": "Dispatcher — analyzes any input (text or images) and routes to the right agent instantly"
+      "description": "Dispatcher — analyzes any input (text or images) and routes to the right agent instantly",
+      "permission": {
+        "question": "allow"
+      }
     },
     "Rimuru - (Orchestrator)": {
       "model": "opencode-go/minimax-m2.7",
@@ -184,6 +187,24 @@
       "mode": "primary",
       "color": "#0EA5E9",
       "description": "Deep Worker — autonomous end-to-end execution: explores, plans, implements, verifies and QAs solo"
+    },
+    "Hange - (QA Tester)": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        {
+          "model": "opencode-go/qwen3.6-plus"
+        },
+        {
+          "model": "opencode-go/minimax-m2.7"
+        }
+      ],
+      "mode": "subagent",
+      "color": "#14B8A6",
+      "description": "QA Tester — E2E browser testing with playwright + chrome-devtools, categorized bug reports, never fixes",
+      "tools": {
+        "write": false,
+        "edit": false
+      }
     },
     "Gojo - (Vision)": {
       "model": "opencode-go/qwen3.7-plus",
