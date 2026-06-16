@@ -245,7 +245,9 @@ subagent will run in the wrong working directory.`,
       ctx.metadata({ title: `→ ${agentKey}${background ? " [bg]" : ""}` })
 
       const rootSession = getSessionRoot(ctx.sessionID) ?? ctx.sessionID
-      const parentID = READ_ONLY_AGENTS.has(agentKey) ? rootSession : ctx.sessionID
+      // Background tasks always attach to rootSession so they appear in the TUI sidebar.
+      // Sync writer agents stay nested under the caller for in-context visibility.
+      const parentID = (background || READ_ONLY_AGENTS.has(agentKey)) ? rootSession : ctx.sessionID
 
       const sessionID = await spawnSession(client, { agentKey, workdir, parentID, prompt })
 
@@ -257,7 +259,7 @@ subagent will run in the wrong working directory.`,
         await client.tui.showToast({
           body: {
             title:    `🤖 ${shortName}${background ? " [bg]" : ""} corriendo`,
-            message:  background ? "Usa background_result para recoger el resultado" : "Ctrl+X ↓ para ver los subagentes",
+            message:  background ? "Visible en el sidebar — usa background_result para recoger el resultado" : "Ctrl+X ↓ para ver los subagentes",
             variant:  "info",
             duration: 4000,
           },
