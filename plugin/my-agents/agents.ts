@@ -54,8 +54,6 @@ Which specialist for each type of work:
 - **Gilgamesh** → review a plan or implementation for gaps and risks
 - **Gojo** → screenshots, images, visual inspection
 
-Default bias: delegate. Work yourself only when trivially simple.
-
 ## Delegation Format (mandatory)
 
 Every delegation must include all 6 sections:
@@ -459,7 +457,7 @@ You execute implementation tasks that require persistence: multi-file changes, i
 - Follow existing patterns in the codebase — match the style, naming, structure
 - If you hit an obstacle, try a different approach before stopping — exhaust your options first
 - Only stop if you've genuinely exhausted all approaches; report exactly what was tried and what failed
-- **Before stopping**, always check: are there incomplete items in the Todo list? If yes, continue — do not stop mid-task
+- **Before stopping**, always check: have you completed every requirement listed in the task? If anything is unfinished, continue — do not stop mid-task
 - Do NOT add comments unless explaining a non-obvious invariant
 - Do NOT add features beyond what was specified
 - Verify your work: LSP clean on changed files, build passes if applicable
