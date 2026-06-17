@@ -28,6 +28,27 @@ It's inspired by `oh-my-openagent`, rebuilt from scratch with a focus on **safet
 - **💸 Model profiles** — `free`, `eco`, `smart`, `optimal`. Switch with `/profile`. The `free` profile runs entirely on opencode zen's zero-cost models.
 - **🧠 Session notepad** — a shared memory file bridges the stateless subagents across a session.
 
+## ⚡ vs. opencode default (Plan + Build)
+
+opencode ships with two built-in agents: **plan** (designs a solution) and **build** (executes it). That's enough for a quick script. For anything larger, the gaps show fast.
+
+| Scenario | Plan + Build | my-agents | Winner |
+|---|---|---|---|
+| **Quick PoC / script** | Plan → Build, 2 steps | Aizen → Kakashi fast-path | Tie (harness adds ~5s routing overhead) |
+| **Feature in existing codebase** | Plan has no codebase knowledge — Build may break existing patterns or duplicate code | Jiraiya explores first → Norman plans with real context → Senku implements following the project's exact conventions | **harness** |
+| **Large / multi-component project** | Single agent plans and executes everything sequentially | Rimuru + parallel background agents. Jiraiya explores modules simultaneously; Senku and Rock-Lee can run in parallel | **harness** |
+| **Simple bug fix** | Plan → Build. Works fine | Aizen → Kakashi. Maps impact, fixes minimally, verifies with LSP | Tie (Kakashi is more systematic) |
+| **Complex bug fix** (cross-repo, multi-cause) | No multi-repo awareness. May edit the wrong repo silently | Rimuru + Jiraiya maps impact + Gaara Guard prevents wrong-repo writes + Senku for the surgical fix | **harness** |
+| **QA / browser testing** | Doesn't exist | Hange: playwright + chrome-devtools together. Catches silent CORS errors, invisible 4xx/5xx, background JS exceptions. Categorized report 🔴🟡🟢 | **harness** by a mile |
+| **Architecture analysis** | Plan reasons over the request text — no real codebase exploration | Urahara (strategic reasoning) + Jiraiya (real codebase) + Gojo (diagram/screenshot analysis) | **harness** |
+| **Screenshot debugging** | Plan describes what it sees → Build tries to fix blind | Aizen extracts stack traces, ports, service names from the image → routes to the right agent with full visual context | **harness** |
+| **Long-running refactor** | May run out of context or stop halfway | Rock-Lee: keeps going until done. Rimuru's notepad shares context across stateless subagents | **harness** |
+| **Plan review before executing** | Plan executes immediately — no gate | Gilgamesh reviews gaps and risks before a single line changes. APPROVED / REVISIONS NEEDED / REJECTED | **harness** |
+| **Multi-repo session** | No protection. Edits whatever is in cwd | Gaara Guard: 3-layer protection. Hook hard-blocks writes outside active project roots | **harness** |
+| **Cost on trivial tasks** | 2 LLM calls, minimal | 3-4 calls minimum (Aizen + agent + tools) | **default** |
+
+**Bottom line:** the default wins only on cost and speed for trivial tasks. The harness wins on everything that involves codebase context, safety, parallelism, QA, or analysis. The inflection point is any task that touches more than one file or domain — that's where the default fails silently.
+
 ## 🥷 The Squad
 
 | Agent | Mode | Role |
