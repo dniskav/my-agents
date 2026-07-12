@@ -196,6 +196,20 @@
         "edit": false,
         "bash": false
       }
+    },
+    "Shikamaru - (Scribe)": {
+      "model": "opencode/nemotron-3-ultra-free",
+      "fallback_models": [
+        {
+          "model": "opencode/big-pickle"
+        },
+        {
+          "model": "opencode/deepseek-v4-flash-free"
+        }
+      ],
+      "mode": "all",
+      "color": "#84CC16",
+      "description": "Scribe — maintains the project wiki (docs/wiki): reads everything, writes only .md"
     }
   },
   "browser_automation_engine": {

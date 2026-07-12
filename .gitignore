@@ -16,19 +16,5 @@ skills/
 
 # local-only opencode state
 .agent-mode
+.rimuru/
 # auth.json   (uncomment if this exists on your machine)
-
-# merged from local opencode plugin .gitignore
-dist/
-build/
-out/
-*.tmp
-Thumbs.db
-__pycache__/
-*.pyc
-.env
-.env.*
-*.swp
-*.swo
-coverage/
-.nyc_output/

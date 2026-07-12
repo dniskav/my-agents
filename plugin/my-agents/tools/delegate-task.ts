@@ -3,7 +3,7 @@ import type { PluginInput } from "@opencode-ai/plugin"
 import { readFileSync, appendFileSync, writeFileSync, mkdirSync } from "fs"
 import { join } from "path"
 import { allowRoot } from "../guard.ts"
-import { setSessionAgent, getSessionAgent, setSessionRoot, getSessionRoot } from "../registry.ts"
+import { setSessionAgent, getSessionAgent, setSessionRoot, getSessionRoot, registerSubagent, updateSubagent, unregisterSubagent } from "../registry.ts"
 
 /** Subagentes read-only: se "aplanan" a la sesión raíz para ser visibles en vivo
  *  en la TUI (Ctrl+X ↓). No escriben, así que el riesgo de sesiones huérfanas
@@ -34,7 +34,13 @@ const AGENT_ALIASES: Record<string, string> = {
   Gilgamesh: "Gilgamesh - (Plan Reviewer)",
   Gojo:      "Gojo - (Vision)",
   Gaara:     "Gaara - (Guardian)",
+  Shikamaru: "Shikamaru - (Scribe)",
 }
+
+const WATCHDOG_PING_MESSAGE = (n: number, max: number, silentSec: number) =>
+  `[WATCHDOG ${n}/${max}] Llevas ${silentSec}s sin actividad visible (sin nuevos mensajes del asistente). ` +
+  `¿Cómo vas? Reporta brevemente: (1) en qué estás trabajando ahora mismo, (2) si estás atascado en algo, ` +
+  `(3) si necesitas más contexto del caller para continuar. Si estás esperando respuesta a una pregunta que ya hiciste, dilo explícitamente.`
 
 interface AgentsConfig {
   agents: Record<string, { model: string }>
@@ -123,21 +129,90 @@ async function spawnSession(
   return sessionID
 }
 
-/** Shared logic: poll until idle, fetch last assistant message. */
 async function waitForResult(
   client: PluginInput["client"],
   sessionID: string,
   workdir: string,
   timeoutMs: number,
-): Promise<{ text: string; timedOut: boolean }> {
+  opts: {
+    watchdogEnabled?: boolean
+    silentThresholdMs?: number
+    maxPings?: number
+    agentKey?: string
+    agentAlias?: string
+    onWatchdogEvent?: (event: { type: "ping" | "stalled"; pingCount: number; silentFor: number }) => void | Promise<void>
+  } = {},
+): Promise<{ text: string; timedOut: boolean; stalled: boolean; pingCount: number }> {
   const maxAttempts = Math.max(1, Math.ceil(timeoutMs / 500))
+  const watchdogEnabled = opts.watchdogEnabled ?? true
+  const silentThresholdMs = opts.silentThresholdMs ?? 60_000
+  const maxPings = opts.maxPings ?? 2
+
   let timedOut = false
+  let pingCount = 0
+  let lastMessageCount = -1
+  let lastActivityAt = Date.now()
+  let stalled = false
+  let messageCheckCounter = 0
+
   for (let i = 0; i < maxAttempts; i++) {
     await sleep(500)
+
     const statusRes = await client.session.status({ query: { directory: workdir } })
     const allStatuses = statusRes.data as Record<string, { type: string }> | undefined
     const sessionStatus = allStatuses?.[sessionID]
     if (!sessionStatus || sessionStatus.type === "idle") break
+
+    // Watchdog: count messages every ~5s to detect actual progress (status "busy" alone is not enough)
+    if (watchdogEnabled) {
+      messageCheckCounter++
+      if (messageCheckCounter >= 10) {
+        messageCheckCounter = 0
+        try {
+          const msgRes = await client.session.messages({
+            path: { id: sessionID },
+            query: { directory: workdir },
+          })
+          const count = (msgRes.data ?? []).length
+          if (count > lastMessageCount) {
+            lastMessageCount = count
+            lastActivityAt = Date.now()
+          }
+        } catch {
+          // ignore message-fetch errors
+        }
+      }
+
+      const silentFor = Date.now() - lastActivityAt
+      if (silentFor > silentThresholdMs && pingCount < maxPings && opts.agentKey) {
+        pingCount++
+        const silentSec = Math.round(silentFor / 1000)
+        if (opts.onWatchdogEvent) {
+          try { await opts.onWatchdogEvent({ type: "ping", pingCount, silentFor }) } catch {}
+        }
+        try {
+          await client.session.prompt({
+            path: { id: sessionID },
+            body: {
+              agent: opts.agentKey,
+              parts: [{ type: "text", text: WATCHDOG_PING_MESSAGE(pingCount, maxPings, silentSec) }],
+            } as any,
+            query: { directory: workdir },
+          })
+        } catch {
+          // ping send failed — keep waiting
+        }
+        lastActivityAt = Date.now() // give the subagent time to respond
+      } else if (silentFor > silentThresholdMs * 2 && pingCount >= maxPings) {
+        // Two pings fired and still silent → mark as stalled, return to caller
+        stalled = true
+        if (opts.onWatchdogEvent) {
+          try { await opts.onWatchdogEvent({ type: "stalled", pingCount, silentFor }) } catch {}
+        }
+        break
+      }
+    }
+
     if (i === maxAttempts - 1) timedOut = true
   }
 
@@ -153,7 +228,7 @@ async function waitForResult(
     .join("\n")
     .trim()
 
-  return { text, timedOut }
+  return { text, timedOut, stalled, pingCount }
 }
 
 export function makeDelegateTask(client: PluginInput["client"], cfg: AgentsConfig) {
@@ -175,6 +250,7 @@ Agents and when to use them:
 - Gilgamesh: review a plan or implementation for gaps and risks
 - Gojo: analyze screenshots, images, diagrams
 - Gaara: repo-identity & boundary guardian — verify you're in the right repo before writes/commits
+- Shikamaru: maintain the project wiki (docs/wiki) — document modules, update docs after changes, distill guides (writes only .md)
 
 BACKGROUND MODE: set background=true to fire-and-forget — returns a task_id immediately so you
 can launch multiple agents in parallel. Retrieve results later with background_result(task_id).
@@ -188,7 +264,7 @@ subagent will run in the wrong working directory.`,
     args: {
       agent: tool.schema
         .string()
-        .describe("Short agent name: Rimuru | Norman | Urahara | Jiraiya | Kakashi | Senku | Rock-Lee | Neji | Gilgamesh | Gojo | Gaara"),
+        .describe("Short agent name: Rimuru | Norman | Urahara | Jiraiya | Kakashi | Senku | Rock-Lee | Neji | Gilgamesh | Gojo | Gaara | Shikamaru"),
       task: tool.schema
         .string()
         .describe("Full task description — be explicit, include all needed context inline. Use the 6-section format when delegating complex work: TASK / EXPECTED OUTCOME / TOOLS TO USE / MUST DO / MUST NOT DO / CONTEXT"),
@@ -216,9 +292,21 @@ subagent will run in the wrong working directory.`,
         .boolean()
         .optional()
         .describe("Fire-and-forget mode. Returns task_id immediately — use background_result(task_id) to retrieve the result later. Use this to run independent agents in true parallel."),
+      watchdog: tool.schema
+        .boolean()
+        .optional()
+        .describe("Enable silent-subagent watchdog (default: true). When enabled, polls for new messages every ~5s. If no new messages for silentThresholdMs, sends a [WATCHDOG N/M] status-check prompt to the subagent. After maxPings without response, returns [STALLED] with the session still alive so the caller can ping/abort it."),
+      silentThresholdMs: tool.schema
+        .number()
+        .optional()
+        .describe("Ms without new subagent messages before the watchdog pings (default: 60000). Lower for short tasks, raise for long ones."),
+      maxPings: tool.schema
+        .number()
+        .optional()
+        .describe("Max watchdog pings before returning [STALLED] (default: 2)."),
     },
 
-    async execute({ agent, task, context, reason, notepadPath, directory, timeoutMs, background }, ctx) {
+    async execute({ agent, task, context, reason, notepadPath, directory, timeoutMs, background, watchdog, silentThresholdMs, maxPings }, ctx) {
       const normalized = agent.toLowerCase().trim()
 
       if (DISPATCH_ONLY_AGENTS.has(normalized)) {
@@ -271,6 +359,16 @@ subagent will run in the wrong working directory.`,
       setSessionRoot(sessionID, rootSession)
 
       const [shortName] = agentKey.split(" - ")
+      registerSubagent(sessionID, {
+        agentKey,
+        agentAlias: shortName,
+        workdir,
+        startedAt: Date.now(),
+        task: task.slice(0, 500),
+        reason: reasonText,
+        pingCount: 0,
+        lastMessageCount: 0,
+      })
       try {
         await client.tui.showToast({
           body: {
@@ -304,7 +402,42 @@ subagent will run in the wrong working directory.`,
       }
 
       // Sync mode: poll until done
-      const { text, timedOut } = await waitForResult(client, sessionID, workdir, timeoutMs ?? 300_000)
+      const { text, timedOut, stalled, pingCount } = await waitForResult(
+        client, sessionID, workdir, timeoutMs ?? 300_000,
+        {
+          watchdogEnabled: watchdog ?? true,
+          silentThresholdMs: silentThresholdMs ?? 60_000,
+          maxPings: maxPings ?? 2,
+          agentKey,
+          agentAlias: shortName,
+          onWatchdogEvent: async (event) => {
+            updateSubagent(sessionID, { pingCount: event.pingCount })
+            if (event.type === "ping") {
+              try {
+                await client.tui.showToast({
+                  body: {
+                    title: `⏰ ${shortName} silencioso`,
+                    message: `Watchdog ping #${event.pingCount} (${Math.round(event.silentFor / 1000)}s sin actividad)`,
+                    variant: "warning",
+                    duration: 3500,
+                  },
+                })
+              } catch {}
+            } else if (event.type === "stalled") {
+              try {
+                await client.tui.showToast({
+                  body: {
+                    title: `🚨 ${shortName} atascado`,
+                    message: `Devuelto a Rimuru tras ${event.pingCount} pings sin respuesta`,
+                    variant: "error",
+                    duration: 5000,
+                  },
+                })
+              } catch {}
+            }
+          },
+        },
+      )
 
       const modelID = cfg.agents[agentKey]?.model ?? agentKey
       const durationMs = Date.now() - startedAt
@@ -324,9 +457,40 @@ subagent will run in the wrong working directory.`,
       logDelegation(ctx.directory, edge)
       writeTranscript(ctx.directory, sessionID, edge, prompt, text)
 
+      // Final subagent tracking — only unregister if not stalled
+      if (!stalled) {
+        unregisterSubagent(sessionID)
+      }
+
+      let outputText = text || "(no output)"
+      if (stalled) {
+        outputText =
+          `[STALLED after ${pingCount} watchdog pings — subagent is silent, but session is still alive]\n\n` +
+          outputText +
+          `\n\nThe subagent session is still alive (task_id: ${sessionID}). You can:\n` +
+          `  - subagent_status(task_id="${sessionID}") to see current state\n` +
+          `  - subagent_ping(task_id="${sessionID}", message="...") to ask directly\n` +
+          `  - subagent_abort(task_id="${sessionID}", reason="...") to give up\n` +
+          `Or ignore and the subagent will eventually finish or be killed.`
+      } else if (timedOut) {
+        outputText = `[TIMEOUT after ${Math.round((timeoutMs ?? 300_000) / 1000)}s]\n\n${outputText}`
+      }
+
       return {
-        output: timedOut ? `[TIMEOUT after ${Math.round((timeoutMs ?? 300_000) / 1000)}s]\n\n${text || "(no output)"}` : text || "(no output)",
-        metadata: { agent: agentKey, model: formatModel(modelID), sessionID, timedOut, directory: workdir, caller, reason: reasonText, durationMs },
+        output: outputText,
+        metadata: {
+          agent: agentKey,
+          model: formatModel(modelID),
+          sessionID,
+          timedOut,
+          stalled,
+          pingCount,
+          task_id: stalled ? sessionID : undefined,
+          directory: workdir,
+          caller,
+          reason: reasonText,
+          durationMs,
+        },
       }
     },
   })

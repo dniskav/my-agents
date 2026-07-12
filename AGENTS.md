@@ -24,6 +24,7 @@ The plugin lives at `plugin/my-agents/`. Configuration variants (eco/smart/optim
 | **Gilgamesh** | Subagent | Plan Reviewer — ruthless critic, APPROVED / REVISIONS NEEDED / REJECTED |
 | **Gojo** | Subagent | Vision — screenshots, images, PDFs, diagrams |
 | **Gaara** | Subagent | Guardian — repo-identity & boundary checks before writes/commits (read-only) |
+| **Shikamaru** | All (primary + subagent) | Scribe — maintains the project wiki (`docs/wiki/`); writes only `.md` |
 
 Full reference with examples: `squad-codex.md`
 
@@ -112,3 +113,4 @@ The active config is loaded from `my-agents.json`. To switch variants, copy the 
 - `Rock-Lee` and `Senku` are both coders — Senku for precision, Rock-Lee for persistence
 - `Hange` never fixes — reports only. The fix loop lives in Rimuru, not Hange
 - `Neji` (static checks: tsc/lint/tests) ≠ `Hange` (live browser QA with playwright + devtools)
+- `Shikamaru` only creates/edits `.md` files under `docs/wiki/` — a hard guard in `index.ts` blocks anything else

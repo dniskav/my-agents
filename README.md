@@ -4,7 +4,7 @@
 
 ### A hand-crafted multi-agent squad for [opencode](https://opencode.ai)
 
-One orchestrator. Ten specialists. Zero chaos.  
+One orchestrator. Eleven specialists. Zero chaos.  
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![opencode](https://img.shields.io/badge/built%20for-opencode-black)](https://opencode.ai)
@@ -21,7 +21,7 @@ It's inspired by `oh-my-openagent`, rebuilt from scratch with a focus on **safet
 
 ## ✨ Features
 
-- **🥷 13-agent squad** orchestrated via a custom `delegate_task` tool — agents call each other with a strict 6-section task format. Each agent has a focused role with no overlap.
+- **🥷 14-agent squad** orchestrated via a custom `delegate_task` tool — agents call each other with a strict 6-section task format. Each agent has a focused role with no overlap.
 - **🛡️ Repo-Identity Guard ("Gaara")** — three layers that stop an agent from editing the *wrong* repository (the classic "I ran opencode in project A but asked it to fix project B" footgun).
 - **🔁 Autonomous loops & missions** — `/loop` iterates `execute → verify` against a checkable done-criterion without per-step gates; `/mission` runs a full gated workflow with crash-safe state.
 - **🌳 Delegation tree** — every delegation is logged (who called whom, why, model, duration) and each subagent's full prompt + reasoning is saved for inspection via `/delegations`.
@@ -40,6 +40,7 @@ opencode ships with two built-in agents: **plan** (designs a solution) and **bui
 | **Simple bug fix** | Plan → Build. Works fine | Aizen → Kakashi. Maps impact, fixes minimally, verifies with LSP | Tie (Kakashi is more systematic) |
 | **Complex bug fix** (cross-repo, multi-cause) | No multi-repo awareness. May edit the wrong repo silently | Rimuru + Jiraiya maps impact + Gaara Guard prevents wrong-repo writes + Senku for the surgical fix | **harness** |
 | **QA / browser testing** | Doesn't exist | Hange: playwright + chrome-devtools together. Catches silent CORS errors, invisible 4xx/5xx, background JS exceptions. Categorized report 🔴🟡🟢 | **harness** by a mile |
+| **Keeping docs current** | Doesn't exist | Shikamaru maintains a per-repo `docs/wiki/` — synthesizes once, updates in place as code changes, never re-derives from scratch | **harness** by a mile |
 | **Architecture analysis** | Plan reasons over the request text — no real codebase exploration | Urahara (strategic reasoning) + Jiraiya (real codebase) + Gojo (diagram/screenshot analysis) | **harness** |
 | **Screenshot debugging** | Plan describes what it sees → Build tries to fix blind | Aizen extracts stack traces, ports, service names from the image → routes to the right agent with full visual context | **harness** |
 | **Long-running refactor** | May run out of context or stop halfway | Rock-Lee: keeps going until done. Rimuru's notepad shares context across stateless subagents | **harness** |
@@ -66,6 +67,7 @@ opencode ships with two built-in agents: **plan** (designs a solution) and **bui
 | **Gilgamesh** | subagent | Plan Reviewer — ruthless critic: APPROVED / REVISIONS / REJECTED |
 | **Gojo** | subagent | Vision — screenshots, images, PDFs, diagrams |
 | **Gaara** | subagent | Guardian — repo-identity & boundary checks before writes/commits (read-only) |
+| **Shikamaru** | all | Scribe — maintains the project wiki (`docs/wiki/`); writes only `.md` |
 
 Full reference with examples: [`squad-codex.md`](./squad-codex.md) · System prompts: [`plugin/my-agents/agents.ts`](./plugin/my-agents/agents.ts)
 

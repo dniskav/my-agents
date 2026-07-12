@@ -12,6 +12,7 @@ Quick map for lazy-loading context files. Load only what's needed.
 | `core/standards/tests.md` | writing tests, test strategy, coverage, test failures | critical |
 | `core/standards/docs.md` | README, API docs, code comments, documentation | critical |
 | `core/standards/analysis.md` | analyze codebase, investigate bug, evaluate architecture, code quality | high |
+| `core/standards/wiki.md` | project wiki, docs/wiki, documentation wiki, ingest, wiki lint | high |
 
 ## Workflows
 

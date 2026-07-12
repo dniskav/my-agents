@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+out/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+.tmp/
+__pycache__/
+*.pyc
+.env
+.env.*
+*.swp
+*.swo
+coverage/
+.nyc_output/

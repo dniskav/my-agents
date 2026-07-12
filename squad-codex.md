@@ -23,6 +23,7 @@
 | **Gilgamesh** | Subagent | Review plans and implementations, find gaps and risks | `minimax-m2.7` |
 | **Gojo** | Subagent | Analyze screenshots, images, PDFs and diagrams | `qwen3.7-plus` |
 | **Gaara** | Subagent | Verify repo identity and boundaries before any write/commit (read-only) | `deepseek-v4-flash` |
+| **Shikamaru** | All (primary + subagent) | Maintain the project wiki (`docs/wiki/`) — ingest, query, lint; writes only `.md` | `kimi-k2.6` |
 
 ---
 
@@ -99,6 +100,10 @@
 > *"We're about to write to this directory — confirm it's the neuron library and not the neuron app"*
 > → Called before any write or commit when the session spans multiple projects or the target repo is ambiguous. Read-only — verdicts only, never edits.
 
+**Shikamaru** ← user (primary) / Rimuru / Kakashi (subagent)
+> *"Document this repo" / "Update the wiki after this change"*
+> → Bootstraps or updates `docs/wiki/` in the target repo: architecture pages, cross-cutting concepts, distilled guides. Rimuru delegates to it after significant implementations land. Only touches `.md` files — a hard guard blocks anything else.
+
 ---
 ---
 
@@ -121,6 +126,7 @@
 | **Gilgamesh** | Subagente | Revisar planes e implementaciones, encontrar gaps y riesgos | `minimax-m2.7` |
 | **Gojo** | Subagente | Analizar screenshots, imágenes, PDFs y diagramas | `qwen3.7-plus` |
 | **Gaara** | Subagente | Verificar identidad del repo y límites antes de cualquier escritura/commit (solo lectura) | `deepseek-v4-flash` |
+| **Shikamaru** | Todos (principal + subagente) | Mantener la wiki del proyecto (`docs/wiki/`) — ingest, query, lint; solo escribe `.md` | `kimi-k2.6` |
 
 ---
 
@@ -188,3 +194,7 @@
 **Gaara** ← Rimuru / Kakashi
 > *"Vamos a escribir en este directorio — confirma que es la librería neuron y no la app neuron"*
 > → Se llama antes de cualquier escritura o commit cuando la sesión abarca múltiples proyectos o el repo destino es ambiguo. Solo lectura — emite veredictos, nunca edita.
+
+**Shikamaru** ← usuario (principal) / Rimuru / Kakashi (subagente)
+> *"Documenta este repo" / "Actualiza la wiki después de este cambio"*
+> → Crea o actualiza `docs/wiki/` en el repo destino: páginas de arquitectura, conceptos transversales, guías destiladas. Rimuru lo delega después de que aterrizan implementaciones importantes. Solo toca archivos `.md` — un guard duro bloquea cualquier otra cosa.

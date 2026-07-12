@@ -131,6 +131,20 @@
         "edit": false
       }
     },
+    "Shikamaru - (Scribe)": {
+      "model": "opencode-go/deepseek-v4-pro",
+      "fallback_models": [
+        {
+          "model": "opencode-go/minimax-m3"
+        },
+        {
+          "model": "opencode-go/qwen3.7-max"
+        }
+      ],
+      "mode": "all",
+      "color": "#84CC16",
+      "description": "Scribe — maintains the project wiki (docs/wiki): reads everything, writes only .md"
+    },
     "Gilgamesh - (Plan Reviewer)": {
       "model": "opencode-go/glm-5.1",
       "fallback_models": [

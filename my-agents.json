@@ -206,6 +206,20 @@
         "edit": false
       }
     },
+    "Shikamaru - (Scribe)": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": [
+        {
+          "model": "opencode-go/minimax-m2.7"
+        },
+        {
+          "model": "opencode-go/qwen3.6-plus"
+        }
+      ],
+      "mode": "all",
+      "color": "#84CC16",
+      "description": "Scribe — maintains the project wiki (docs/wiki): reads everything, writes only .md"
+    },
     "Gojo - (Vision)": {
       "model": "opencode-go/qwen3.7-plus",
       "fallback_models": [

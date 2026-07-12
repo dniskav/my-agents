@@ -4,10 +4,11 @@ import { join } from "path"
 import { homedir } from "os"
 import { PROMPTS } from "./agents.ts"
 import { makeDelegateTask, makeBackgroundResult } from "./tools/delegate-task.ts"
+import { makeSubagentPing, makeSubagentAbort, makeSubagentStatus } from "./tools/subagent-management.ts"
 import { makeHandoff } from "./tools/handoff.ts"
 import { hashlineRead, hashlineEdit } from "./tools/hashline.ts"
 import { allowRoot, isAllowedPath, getRoots } from "./guard.ts"
-import { setSessionAgent, setSessionRoot, getSessionRoot, getPendingHandoff, clearPendingHandoff, setAgentOverride, getAgentOverride } from "./registry.ts"
+import { setSessionAgent, getSessionAgent, setSessionRoot, getSessionRoot, getPendingHandoff, clearPendingHandoff, setAgentOverride, getAgentOverride } from "./registry.ts"
 
 interface AgentEntry {
   model: string
@@ -101,6 +102,9 @@ export const server: Plugin = async (input) => {
     tool: {
       delegate_task:     makeDelegateTask(input.client, cfg),
       background_result: makeBackgroundResult(input.client),
+      subagent_ping:     makeSubagentPing(input.client),
+      subagent_abort:    makeSubagentAbort(input.client),
+      subagent_status:   makeSubagentStatus(input.client),
       handoff:           makeHandoff(input.client),
       hashline_read:     hashlineRead,
       hashline_edit:     hashlineEdit,
@@ -180,6 +184,17 @@ export const server: Plugin = async (input) => {
           getRoots().map((r) => `  - ${r}`).join("\n") +
           `\n\nSi de verdad debes trabajar en otra carpeta, delega con el parámetro ` +
           `'directory' apuntando a la ruta absoluta de ese proyecto.`
+        )
+      }
+
+      // Shikamaru Guard: el Scribe solo puede escribir markdown.
+      const sessionID: string | undefined = hookInput?.sessionID
+      const agentName = getSessionAgent(sessionID)
+      if (agentName.startsWith("Shikamaru") && !/\.(md|markdown)$/i.test(filePath)) {
+        throw new Error(
+          `🛑 SHIKAMARU GUARD: el Scribe solo escribe archivos .md.\n` +
+          `  Intento bloqueado: ${filePath}\n` +
+          `Si esto requiere tocar código, repórtalo en la wiki y delega a Senku/Rock-Lee.`
         )
       }
     },

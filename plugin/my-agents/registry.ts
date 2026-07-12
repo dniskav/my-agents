@@ -89,3 +89,39 @@ export function setAgentOverride(sessionID: string, agentKey: string): void {
 export function getAgentOverride(sessionID: string): string | undefined {
   return agentOverride.get(sessionID)
 }
+
+
+// Active subagent tracking (for watchdog + ping/abort/status)
+export interface ActiveSubagent {
+  agentKey: string       // full agent key, e.g. "Senku - (Coder)"
+  agentAlias: string     // short alias, e.g. "Senku"
+  workdir: string        // absolute workdir
+  startedAt: number      // Date.now() when spawned
+  task: string           // the original task (first 500 chars)
+  reason: string         // the reason field
+  pingCount: number      // watchdog pings sent so far
+  lastMessageCount: number // for activity tracking
+}
+
+const activeSubagents = new Map<string, ActiveSubagent>()
+
+export function registerSubagent(sessionID: string, info: ActiveSubagent): void {
+  activeSubagents.set(sessionID, info)
+}
+
+export function updateSubagent(sessionID: string, patch: Partial<ActiveSubagent>): void {
+  const existing = activeSubagents.get(sessionID)
+  if (existing) activeSubagents.set(sessionID, { ...existing, ...patch })
+}
+
+export function unregisterSubagent(sessionID: string): void {
+  activeSubagents.delete(sessionID)
+}
+
+export function getSubagent(sessionID: string): ActiveSubagent | undefined {
+  return activeSubagents.get(sessionID)
+}
+
+export function listSubagents(): ActiveSubagent[] {
+  return Array.from(activeSubagents.values())
+}
