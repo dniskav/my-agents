@@ -1,4 +1,4 @@
-import { resolve } from "path"
+import { resolve, sep } from "path"
 
 /**
  * Boundary guard (capa C del "Gaara Guard").
@@ -25,7 +25,7 @@ export function isAllowedPath(filePath: string): boolean {
   if (allowedRoots.size === 0) return true // fail-open: sin roots → sin enforcement
   const target = resolve(filePath)
   for (const root of allowedRoots) {
-    if (target === root || target.startsWith(root + "/")) return true
+    if (target === root || target.startsWith(root + sep)) return true
   }
   return false
 }
